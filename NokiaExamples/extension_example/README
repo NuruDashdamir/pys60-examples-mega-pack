@@ -1,0 +1,77 @@
+This is an example of a minimal extension for Python for Series 60.
+
+Requirements
+------------
+
+- Series 60 SDK, 1.2, 2.0 or 2.1 (tested with 2.0)
+- Python for Series 60 SDK 1.0
+- if you want to compile for the emulator: Microsoft Visual C++ 6.0 or
+  later
+
+Installation
+------------
+
+Unpack the code to a directory "elemlist" under your Symbian SDK, at
+the same level as the "epoc32" directory. That is, the "epoc32"
+directory should be accessible as "..\epoc32" from the elemlist
+directory. E.g. your epoc32 directory is
+\symbian\7.0s\series60_v20\epoc32, place the elemlist code in
+\symbian\7.0s\series60_v20\elemlist.
+
+Building
+--------
+
+These are the step-by-step instructions. A script file build_all.cmd
+that does all of the necessary steps (and some extra cleanup, just to
+be sure) has been provided for convenience. You can either use that or
+perform the build manually using these instructions.
+
+1. Go to the elemlist directory. Enter:
+
+     bldmake bldfiles
+
+2a. To build the extension for the phone, enter:
+
+     abld build armi urel
+     abld freeze
+     abld build armi urel
+
+2b. To build it for the emulator environment, enter:
+
+     abld build wins udeb
+     abld freeze
+     abld build wins udeb
+
+  Note: The "freeze" step only needs to be done once. After changing
+  the code, just one "abld build armi urel" or "abld build wins udeb"
+  will rebuild the code properly.
+
+3a. For the phone build: 
+    You should find the built module in:     
+
+     (path to your SDK)\epoc32\release\armi\urel\elemlist.pyd
+
+    Transfer the elemlist.pyd file to your phone, in the \system\libs
+    directory.
+
+3b. For the emulator build:
+    You should find the built module in:
+
+     (path to your SDK)\epoc32\release\wins\udeb\elemlist.pyd
+   
+    To make the file available to the Python interpreter, copy it
+    to:
+
+     (path to your SDK)\epoc32\release\wins\udeb\z\system\libs\elemlist.pyd
+
+Testing
+-------
+
+Start the interpreter and try the following code:
+	
+   from elemlist import *
+   cell=cons(1,2)
+   car(cell)
+   cdr(cell)
+
+The results of the last two commands should, of course, be 1 and 2.

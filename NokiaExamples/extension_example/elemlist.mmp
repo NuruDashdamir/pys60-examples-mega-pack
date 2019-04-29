@@ -1,0 +1,19 @@
+TARGETTYPE	dll
+TARGET		elemlist.pyd
+TARGETPATH	\system\libs
+
+NOSTRICTDEF
+DEFFILE		elemlist.frz
+
+SYSTEMINCLUDE 	\epoc32\include
+SYSTEMINCLUDE 	\epoc32\include\libc
+
+USERINCLUDE   	\python-port-s60\symbian_python\Symbian
+USERINCLUDE   	\python-port-s60\symbian_python\Include
+USERINCLUDE   	\python-port-s60\symbian_python\Python
+
+LIBRARY 	python222.lib
+LIBRARY 	euser.lib
+LIBRARY         estlib.lib /* Necessary only if you use the C standard library */
+
+SOURCE		elemlist.cpp

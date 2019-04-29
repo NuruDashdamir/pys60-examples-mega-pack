@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Example: Makes sure the scripts in e:\system\apps\python on the phone are 
+# in sync with the ones in /c/users/scripts/playground.
+
+fctool syncfiles e:/system/apps/python /c/users/scripts/playground/*.py
+echo "Finished. Press enter to quit:"
+read
