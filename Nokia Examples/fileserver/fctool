@@ -1,0 +1,121 @@
+#!/usr/bin/env python
+#
+# A simple command line client for the simple file transfer server
+# for Series 60 Python environment.
+#     
+# Copyright (c) 2005 Nokia. All rights reserved.
+
+import sys
+import os
+import fileclient
+import binascii
+
+color=1
+
+if color:
+    colormap={'red': '\033[31;1m',
+              'green': '\033[32;1m',
+              'blue': '\033[34;1m',
+              'yellow': '\033[33;1m',
+              'cyan': '\033[36;1m',
+              'magenta': '\033[35;1m',
+              'white': '\033[37;1m',
+              }
+    coloroff='\033[0m'
+    def colorize(color,text):
+        return colormap[color]+text+coloroff
+else:
+    def colorize(color,text):
+        return text
+    
+def cmd_download(client,remotefile,localfile=None):
+    client.download(remotefile,localfile)
+    print "Downloaded file from "+remotefile+"."
+
+def cmd_upload(client,remotefile,localfile=None):
+    client.upload(remotefile,localfile)
+    print "Uploaded file to "+remotefile+"."
+
+def cmd_get(client,remotefile):
+    print "File contents: "+client.get(remotefile)
+
+def cmd_put(client,remotefile,content):
+    client.put(remotefile,content)
+    print "Data uploaded to file "+remotefile
+
+def cmd_eval(client,expression):
+    print "Result: "+repr(client.eval(expression))
+
+def cmd_exec(client,*expression):
+    client.exec_(' '.join(expression))
+
+def cmd_killserver(client):
+    client.killserver()
+    print "Sent quit command to server."
+
+def syncfiles(client,files):
+    """Update the given files on the remote host to the same
+    versions as on the local filesystem. The argument files is
+    a list of (localfile,remotefile) tuples."""
+    print "Obtaining remote checksums..."
+    #client.exec_('import sync')
+    (localfiles,remotefiles)=zip(*files)
+    remotesums=client.eval('file_checksums('+repr(remotefiles)+')')
+    print "Remote checksums: "+repr(remotesums)
+    localsums=map(file_checksum,localfiles)
+    for ((localfile,remotefile),localsum) in zip(files,localsums):
+        if localsum != remotesums[remotefile]:
+            print colorize('green',"Checksum mismatch for file "+remotefile+" - uploading...")
+            client.upload(remotefile,localfile)
+        else:
+            print colorize('white',"Checksum of "+remotefile+" matches - not uploading.")
+
+def cmd_syncdir(client,remotedir,localdir):
+    files=filter(lambda x: os.path.isfile(os.path.join(localdir,x)),os.listdir(localdir))
+    print "Synchronizing files: "+' '.join(files)
+    filelist=[(os.path.join(localdir,x),
+               os.path.join(remotedir,x)) for x in files]
+    syncfiles(client,filelist)
+
+def cmd_syncfiles(client,remotedir,*localfiles):
+    localfiles=filter(os.path.isfile,localfiles)
+    files=[]
+    for k in localfiles:
+        files.append((k,os.path.join(remotedir,os.path.basename(k))))
+    syncfiles(client,files)
+def cmd_ping(client):
+    print "Probing server..."
+    result=client.eval('2+2')
+    if result==4:
+        print "The server is alive and well."
+    else:
+        print "The server is down."
+def file_checksum(filename):
+    f=open(filename,'rb')
+    checksum = binascii.crc32(f.read())
+    f.close()
+    return checksum
+
+if len(sys.argv)<2:
+    print "Usage: fctool [-v] command [args]"
+    sys.exit()
+
+if sys.argv[1]=='-v':
+    verbose=1
+    del sys.argv[1]
+else:
+    verbose=0
+
+cmd=sys.argv[1]
+args=sys.argv[2:]
+
+try:
+    cmdfunc=globals()['cmd_'+cmd]
+except:
+    raise "Unknown command "+cmd
+
+#print "Executing command: "+cmd+str(tuple(args))
+
+client=fileclient.connect('/dev/ttyS4',verbose)
+
+cmdfunc(client,*args)
