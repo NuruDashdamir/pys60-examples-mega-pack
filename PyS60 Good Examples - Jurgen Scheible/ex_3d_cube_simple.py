@@ -7,7 +7,7 @@
 # up arrow key it should spin again around all 3 axis at the same time as in start-up.
 
 
-import appuifw, key_codes, glcanvas, graphics
+import appuifw, key_codes, glcanvas, graphics, e32
 from gles import *
 
 vertices = array(GL_BYTE, 3, [
