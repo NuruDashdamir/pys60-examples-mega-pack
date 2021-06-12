@@ -15,7 +15,8 @@ if greetings:
         items_to_buy.append(greetings)
 
 shoppinglist = ", ".join(items_to_buy)
-print "Sending SMS: " + shoppinglist
-messaging.sms_send("+1234567", shoppinglist)
 
-appuifw.note(u"Shoppinglist sent")
+### SMS sending code commented
+#print "Sending SMS: " + shoppinglist
+#messaging.sms_send("+1234567", shoppinglist)
+#appuifw.note(u"Shoppinglist sent")
