@@ -1,5 +1,5 @@
 
-import appuifw, socket, e32
+import appuifw, btsocket, e32
 
 ECHO = True
 
@@ -21,9 +21,9 @@ def read_and_echo(fd):
         if ECHO: fd.write("\n")
         return buf
 
-address, services = socket.bt_discover()
+address, services = btsocket.bt_discover()
 channel = choose_service(services)
-conn = socket.socket(socket.AF_BT, socket.SOCK_STREAM)
+conn = btsocket.socket(btsocket.AF_BT, btsocket.SOCK_STREAM)
 conn.connect((address, channel))
 to_peer = conn.makefile("rw", 0)
 
