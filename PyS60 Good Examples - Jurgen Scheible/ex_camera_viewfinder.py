@@ -11,6 +11,7 @@ def take_picture():
     pic.save('e:\\Images\\picture1.jpg')
 
 def quit():
+    camera.stop_finder()
     app_lock.signal()
 
 canvas = appuifw.Canvas()
