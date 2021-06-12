@@ -1,0 +1,39 @@
+/* Copyright (c) 2008-2009 Nokia Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+TARGET        python_console.exe
+TARGETTYPE    exe
+UID           0x100039CE 0x12345678
+VENDORID      0
+CAPABILITY    LocalServices NetworkServices ReadUserData WriteUserData UserEnvironment
+EPOCHEAPSIZE  100000 83886080
+EPOCSTACKSIZE 81920
+
+SYSTEMINCLUDE    \epoc32\include\python25
+SYSTEMINCLUDE    \epoc32\include\stdapis
+SYSTEMINCLUDE    \epoc32\include
+
+// Using main() as entry point
+STATICLIBRARY libcrt0.lib
+
+// libc and euser are always needed when using main() entry point
+LIBRARY libc.lib
+LIBRARY euser.lib
+LIBRARY libpthread.lib libdl.lib libm.lib
+LIBRARY python25.lib
+LIBRARY aknnotify.lib eiksrv.lib
+
+SOURCEPATH      ..\src
+SOURCE          python_console.cpp

@@ -1,0 +1,68 @@
+This is an example of a minimal extension for Python for Series 60.
+
+Requirements
+------------
+
+- Series 60 SDK, 3rdEd or higher (tested with 3rdEd and 3rdEdFP2)
+- Python for S60 1.9.x SDK package
+- Open C/C++ plug-in
+  Available from:
+  http://www.forum.nokia.com/info/sw.nokia.com/id/91d89929-fb8c-4d66-bea0-227e42df9053/Open_C_SDK_Plug-In.html 
+
+Installation
+------------
+
+Place the Python for Series 60 SDK 3rdEd under the Symbian SDK installation
+directory, at the same level as the "epoc32" directory. Extract the SDK zip
+package here(On Windows if you have WinZip installed, right-click on the zip
+and in the menu select : 'Winzip->Extract to here')
+
+Building
+--------
+
+Modify the mmp file to include "Location" capability while building for 3rdEdFp2 
+and higher devices. A script file build_all.cmd that does all the necessary 
+steps (and some extra cleanup, just to be sure) has been provided for
+convenience. You can either use that or perform the build manually using these 
+instructions.
+  
+1. Go to the elemlist directory. Enter:
+
+     bldmake bldfiles
+
+2a. To build the extension for the phone, enter:
+
+     abld build gcce urel
+     abld freeze
+     abld build gcce urel
+
+2b. To build it for the emulator environment, enter:
+
+     abld build winscw udeb
+     abld freeze
+     abld build winscw udeb
+
+  Note: The "freeze" step only needs to be done once. After changing
+  the code, just one "abld build gcce urel" or "abld build winscw udeb"
+  will rebuild the code properly.
+
+3a. For the phone build: 
+    You should find the built module in:     
+
+     (path to your SDK)\epoc32\release\gcce\urel\251_elemlist.pyd
+
+    Use the provided pkg file(group\elemlist.pkg) to create a SIS file for
+    installation onto the phone.
+
+Testing
+-------
+
+Start the interpreter and select 'Interactive Console' from the Options 
+menu. Then try the following code:
+
+   from elemlist import *
+   cell=cons(1,2)
+   car(cell)
+   cdr(cell)
+
+The results of the last two commands should, of course, be 1 and 2.

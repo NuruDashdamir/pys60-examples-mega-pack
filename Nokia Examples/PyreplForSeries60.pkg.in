@@ -1,0 +1,50 @@
+; Copyright (c) 2005 Nokia Corporation
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+
+;
+; Installation file for S60 Python Pyrepl library.
+;
+;Languages
+&EN
+;
+; UID is the app's UID
+;
+#{"Python pyrepl library"},(${{PYS60_UID_PYREPL}}),0,9,5,TYPE=SISSYSTEM
+;
+; Supports Series 60 v 2.0
+(0x101F7960), 0, 0, 0, {"Series60ProductID"}
+; Python for Series 60 version 1.0.0 required.
+(${{PYS60_UID_S60}}), 1, 0, 0, {"Python for Series 60"}
+;
+; Files to install
+;
+"pyrepl\__init__.py" -"!:\system\libs\pyrepl\__init__.py"
+"pyrepl\ascii.py" -"!:\system\libs\pyrepl\ascii.py"
+"pyrepl\cmdrepl.py" -"!:\system\libs\pyrepl\cmdrepl.py"
+"pyrepl\commands.py" -"!:\system\libs\pyrepl\commands.py"
+"pyrepl\completer.py" -"!:\system\libs\pyrepl\completer.py"
+"pyrepl\completing_reader.py" -"!:\system\libs\pyrepl\completing_reader.py"
+"pyrepl\console.py" -"!:\system\libs\pyrepl\console.py"
+"pyrepl\dumbcurses.py" -"!:\system\libs\pyrepl\dumbcurses.py"
+"pyrepl\dumbpickle.py" -"!:\system\libs\pyrepl\dumbpickle.py"
+"pyrepl\dumbunicodedata.py" -"!:\system\libs\pyrepl\dumbunicodedata.py"
+"pyrepl\historical_reader.py" -"!:\system\libs\pyrepl\historical_reader.py"
+"pyrepl\input.py" -"!:\system\libs\pyrepl\input.py"
+"pyrepl\keymap.py" -"!:\system\libs\pyrepl\keymap.py"
+"pyrepl\module_lister.py" -"!:\system\libs\pyrepl\module_lister.py"
+"pyrepl\python_reader.py" -"!:\system\libs\pyrepl\python_reader.py"
+"pyrepl\reader.py" -"!:\system\libs\pyrepl\reader.py"
+"pyrepl\socket_console.py" -"!:\system\libs\pyrepl\socket_console.py"
+"pyrepl\socket_keymap.py" -"!:\system\libs\pyrepl\socket_keymap.py"
+"pyrepl\unix_eventqueue.py" -"!:\system\libs\pyrepl\unix_eventqueue.py"

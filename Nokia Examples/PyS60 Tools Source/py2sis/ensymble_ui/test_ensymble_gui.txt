@@ -1,0 +1,92 @@
+# These are the basic steps which will be helpful in testing for the
+# functionality of the application packager GUI.
+
+NOTE:
+-The Application source field is mandatory.
+-The additional fields which get displayed when 'More' button is clicked are all
+ optional.
+
+1. Toggle selection between Script file and Script Directory radio button in the
+   Application source field and on clicking on the 'Browse' button, the
+   appropriate browse window should be displayed(i.e browse file and browse
+   directory respectively)
+
+2. Check if the 'Create' button is in the disabled state when the
+   "Application source" field is empty. Select 'Script file' radio
+   button and select a file from the browse dialog box. The 'Create' button
+   should now get enabled.
+
+3. Repeat step 2 and click on 'Create' button to get a dialog box displaying
+   the successful creation of sis message. Also the location of the sis file
+   created has to be displayed along with the file name.
+   For example, if the entered filename was game.py from the directory
+   'C:\Program Files\PythonForS60' then the message should state something like
+   this ->
+   "Sis created successfully. It can be found here : C:\Program Files\PythonForS60\game.py"
+   Then check if the sis file is created or not in the same directory as the
+   source file.
+
+4. Repeat test 3 but with 'Script directory' option set. The directory selected
+   should be a direcory of py files, one of them being 'default.py'
+   Creation of sis file successfully should place a sis file having the name of
+   that directory in the immediate parent directory.
+
+5. Click on the 'Help' button and the ensymble_ui help html file should pop up.
+   In the html file check if the hyperlinks are working.
+   For example, Clicking on 'Create' hyperlink should navigate to that option
+   Also clicking on the ensymble README link should open the README file.
+
+6. Initially the 'More ' button should be displayed along with the 'Create' and
+   'Help' in the same row.Clicking on 'More' should change the button to 'Less'
+   and display the additional fields. Check if all the additional fields are
+   displayed.
+
+7. After clicking on 'More' button do these tests:
+
+>> Enter the application title, version, UID,  only as a part of this test.
+   Then select a script file create sis
+   The sis file name will have the version number in it. Check for the correctness
+   with the entered version number.
+   Open the sis created with the SISContents tool ( filerblr\\tools )
+   (a) Check for the correct application name and UID
+   (b) Check 'contents' option in the tool and then click on the exe file.
+       Check the minimum and maximum heap size (Note: The size is displayed in hex
+       in the tool). It should be the default (4k, 1M)
+   (c) Install the sis on the device and it should run the application in S60UI
+       mode as this is the default mode.
+
+>> Browse for the certificate. It should be in PEM format. when selected if there
+   is a key by the same name in the same directory it should get entered in the
+   Private key field. Else the field is left empty.
+   Enter a pass phrase in the Pass phrase field. The entered text should be shown
+   as '*'. Check the 'Console' option in Profile radio frame. Select a file and
+   create sis. The application should run in the console environment now.
+
+>> This is basically testing for the heap size field.
+   -Enter a heap size in the min field of heap size. Create sis after selecting a
+   script file. Check by using SISContents tool that both the heap min and max size
+   should have got the same values.
+   -> If you have entered value '1000' in heap min field the SISContents
+      should display 0x3E8 for both min and max.
+   -Check similarly for max field of heap size.
+   -Check now by specifying the range for heap size and it should get
+    reflected appropriately.
+
+>> Clicking on the 'options' button should display the ensymble help for
+   options that can be specified to ensymble. By looking at the options, pass few
+   parameters in the additional options field. Check for their working by using
+   SISContents and running the application on the device.
+
+>> This test is for the 1.4.x compatibility
+   -Check the '1.4.x compatibility' checkbox. When this is checked the modules
+   imported must be the PyS60 modules rather than the Python core modules. This
+   can be checked for by using calendar and socket modules.
+   -When not checked the Python core modules will be prioritized. So in this
+    case the calendar and the socket will be from PyCore and if we have to use
+    the PyS60 modules they will be available with the new names of e32calendar
+    and btsocket.Check for their working by writing a script which calls a few
+    API 's from the respective modules.
+
+8. 'Reset' button should be disabled when none of the fields has values. Enter
+   some value to any of the fields and check if 'Reset' is enabled. Click
+   on 'Reset' button and the fields should be cleared.
