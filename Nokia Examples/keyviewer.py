@@ -1,9 +1,3 @@
-#
-# keyviewer.py
-#
-# Copyright (c) 2005 Nokia. All rights reserved.
-#
-
 import appuifw
 import graphics
 import e32

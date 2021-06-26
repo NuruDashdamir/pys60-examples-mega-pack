@@ -1,21 +1,3 @@
-#
-# snake.py
-#
-# Copyright (c) 2005 Nokia Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
 import appuifw
 import math
 import e32
@@ -35,8 +17,7 @@ class SnakeGame:
         self.wormlocs=[]
         self.wormlength=10
         self.foodloc=None
-        self.fieldcolor=(192,192,128)
-        self.resboxoffset=2        
+        self.fieldcolor=(192,192,128)        
         self.state='init'        
         self.old_body=appuifw.app.body
         self.canvas=appuifw.Canvas(redraw_callback=self.redraw)
@@ -71,11 +52,8 @@ class SnakeGame:
                              loc[0]*self.step+self.step,
                              16+loc[1]*self.step+self.step),fill=color)
     def draw_score(self):
-        scoretext=u"Score: %d"%self.score
-        textrect=self.draw.measure_text(scoretext, font='title')[0]
-        self.draw.rectangle((0,0,textrect[2]-textrect[0]+self.resboxoffset,
-                             textrect[3]-textrect[1]+self.resboxoffset),fill=(0,0,0))      
-        self.draw.text((-textrect[0],-textrect[1]),scoretext,(0,192,0),"title")
+        self.draw.rectangle((0,0,176,16),fill=(0,0,0))
+        self.draw.text((0,14),u"Score: %d"%self.score,(0,192,0))
     def draw_food(self):
         self.draw_square(self.foodloc,(255,0,0))        
     def place_food(self):

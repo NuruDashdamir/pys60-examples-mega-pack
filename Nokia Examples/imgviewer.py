@@ -1,7 +1,5 @@
-
-import appuifw
+import appuifw, e32
 from graphics import *
-import e32
 import key_codes
 
 appuifw.app.screen='full'

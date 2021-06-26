@@ -52,6 +52,7 @@ acceleration=0.05
 import time
 start_time=time.clock()
 n_frames=0
+
 while running:
     img.clear(0)
     img.text((0,14),u'Use arrows to move ball',0xffffff)

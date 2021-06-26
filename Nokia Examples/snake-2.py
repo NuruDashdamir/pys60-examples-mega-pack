@@ -1,9 +1,3 @@
-#
-# snake.py
-#
-# Copyright (c) 2005 Nokia. All rights reserved.
-#
-
 import appuifw
 import math
 import e32
@@ -23,7 +17,8 @@ class SnakeGame:
         self.wormlocs=[]
         self.wormlength=10
         self.foodloc=None
-        self.fieldcolor=(192,192,128)        
+        self.fieldcolor=(192,192,128)
+        self.resboxoffset=2        
         self.state='init'        
         self.old_body=appuifw.app.body
         self.canvas=appuifw.Canvas(redraw_callback=self.redraw)
@@ -58,8 +53,11 @@ class SnakeGame:
                              loc[0]*self.step+self.step,
                              16+loc[1]*self.step+self.step),fill=color)
     def draw_score(self):
-        self.draw.rectangle((0,0,176,16),fill=(0,0,0))
-        self.draw.text((0,14),u"Score: %d"%self.score,(0,192,0))
+        scoretext=u"Score: %d"%self.score
+        textrect=self.draw.measure_text(scoretext, font='title')[0]
+        self.draw.rectangle((0,0,textrect[2]-textrect[0]+self.resboxoffset,
+                             textrect[3]-textrect[1]+self.resboxoffset),fill=(0,0,0))      
+        self.draw.text((-textrect[0],-textrect[1]),scoretext,(0,192,0),"title")
     def draw_food(self):
         self.draw_square(self.foodloc,(255,0,0))        
     def place_food(self):
