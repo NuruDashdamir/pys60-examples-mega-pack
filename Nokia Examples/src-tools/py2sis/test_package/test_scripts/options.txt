@@ -1,0 +1,3 @@
+test_developer: --uid=0xE7661C50 --profile=console
+test_standard: --uid=0xE594DCD1 --profile=console
+test_calculator: --uid=0xEF4A26FB --profile=console

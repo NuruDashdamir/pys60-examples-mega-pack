@@ -1,0 +1,1106 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+##############################################################################
+# cmd_py2sis.py - Ensymble command line tool, py2sis command
+# Copyright 2006, 2007, 2008, 2009 Jussi Ylänen
+#
+# Portions Copyright (c) 2008-2010 Nokia Corporation
+#
+# This file is part of Ensymble developer utilities for Symbian OS(TM).
+#
+# Ensymble is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Ensymble is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ensymble; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+##############################################################################
+
+import sys
+import os
+import re
+import imp
+import getopt
+import getpass
+import locale
+import zlib
+import shutil
+import time
+import zipfile
+
+import sisfile
+import sisfield
+import symbianutil
+import rscfile
+import miffile
+import module_repo
+import py_compile
+
+
+##############################################################################
+#  Specify the magic number of the Python interpreter used in PyS60.
+##############################################################################
+pys60_magic_number = '\xb3\xf2\r\n'
+
+
+##############################################################################
+# Help texts
+##############################################################################
+
+shorthelp = 'Create a SIS package for a "Python for S60" application'
+longhelp = '''py2sis
+    [--uid=0x01234567] [--appname=AppName] [--version=1.0.0]
+    [--lang=EN,...] [--icon=icon.svg] [--shortcaption="App. Name",...]
+    [--caption="Application Name",...] [--drive=C] [--extrasdir=root]
+    [--textfile=mytext_%C.txt] [--cert=mycert.cer] [--privkey=mykey.key]
+    [--passphrase=12345] [--heapsize=min,max] [--caps=Cap1+Cap2+...]
+    [--vendor="Vendor Name",...] [--autostart] [--runinstall]
+    [--encoding=terminal,filesystem] [--verbose] [--profile=s60ui]
+    [--mode=pys60] [--extra-modules=mod1,...] [--sourcecode]
+    [--ignore-missing-deps] [--platform-uid=0x101f7961,...]
+    <src> [sisfile]
+
+Create a SIS package for a "Python for S60" application.
+
+Options:
+    src           - Source script or directory
+    sisfile       - Path of the created SIS file
+    uid           - Symbian OS UID for the application
+    appname       - Name of the application
+    version       - Application version: X.Y.Z or X,Y,Z (major, minor, build)
+    lang          - Comma separated list of two-character language codes
+    icon          - Icon file in SVG-Tiny format
+    shortcaption  - Comma separated list of short captions in all languages
+    caption       - Comma separated list of long captions in all languages
+    drive         - Drive where the package will be installed (any by default)
+    extrasdir     - Name of dir. tree placed under drive root (none by default)
+    textfile      - Text file (or pattern, see below) to display during install
+    cert          - Certificate to use for signing (PEM format)
+    privkey       - Private key of the certificate (PEM format)
+    passphrase    - Pass phrase of the private key (insecure, use stdin instead)
+    caps          - Capability names, separated by "+" (LocalServices, NetworkServices,
+                    ReadUserData, WriteUserData and UserEnvironment by default)
+    vendor        - Vendor name or a comma separated list of names in all lang.
+    autostart     - Application is registered to start on each device boot
+    runinstall    - Application is automatically started after installation
+    heapsize      - Application heap size, min. and/or max. ("100K,4M" by default)
+    encoding      - Local character encodings for terminal and filesystem
+    verbose       - Print extra statistics
+    profile       - Script execution environment. Either console or s60ui
+    mode          - Module to be packaged when names conflict. Either from pycore or pys60
+    extra-modules - Additional dependency modules that should be packaged with the application
+    sourcecode    - Package scripts as source code. By default the scripts are packaged as bytecode
+    ignore-missing-deps - Ignore any missing dependencies during packaging
+    platform-uid  - UID of the supported S60 platforms
+
+If no certificate and its private key are given, a default self-signed
+certificate is used to sign the SIS file. Software authors are encouraged
+to create their own unique certificates for SIS packages that are to be
+distributed.
+
+If no icon is given, the Python logo is used as the icon. The Python
+logo is a trademark of the Python Software Foundation.
+
+Text to display uses UTF-8 encoding. The file name may contain formatting
+characters that are substituted for each selected language. If no formatting
+characters are present, the same text will be used for all languages.
+
+    %%           - literal %
+    %n           - language number (01 - 99)
+    %c           - two-character language code in lowercase letters
+    %C           - two-character language code in capital letters
+    %l           - language name in English, using only lowercase letters
+    %l           - language name in English, using mixed case letters
+'''
+
+
+##############################################################################
+# Parameters
+##############################################################################
+
+MAXPASSPHRASELENGTH     = 256
+MAXCERTIFICATELENGTH    = 65536
+MAXPRIVATEKEYLENGTH     = 65536
+MAXICONFILESIZE         = 65536
+MAXOTHERFILESIZE        = 1024 * 1024 * 8   # Eight megabytes
+MAXTEXTFILELENGTH       = 1024
+
+
+##############################################################################
+# Public module-level functions
+##############################################################################
+
+
+def run(pgmname, argv):
+    # Determine system character encodings.
+    try:
+        # getdefaultlocale() may sometimes return None.
+        # Fall back to ASCII encoding in that case.
+        terminalenc = locale.getdefaultlocale()[1] + ""
+    except TypeError:
+        # Invalid locale, fall back to ASCII terminal encoding.
+        terminalenc = "ascii"
+
+    try:
+        # sys.getfilesystemencoding() was introduced in Python v2.3 and
+        # it can sometimes return None. Fall back to ASCII if something
+        # goes wrong.
+        filesystemenc = sys.getfilesystemencoding() + ""
+    except (AttributeError, TypeError):
+        filesystemenc = "ascii"
+
+    try:
+        gopt = getopt.gnu_getopt
+    except:
+        # Python <v2.3, GNU-style parameter ordering not supported.
+        gopt = getopt.getopt
+
+    # Parse command line arguments.
+    short_opts = "u:n:r:l:i:s:c:f:x:t:a:k:p:b:d:gRH:e:vhP:m:o:Sy:Iq"
+    long_opts = [
+        "uid=", "appname=", "version=", "lang=", "icon=",
+        "shortcaption=", "caption=", "drive=", "extrasdir=", "textfile=",
+        "cert=", "privkey=", "passphrase=", "caps=", "vendor=",
+        "autostart", "runinstall", "heapsize=",
+        "encoding=", "verbose", "debug", "help", "profile=", "mode=",
+        "extra-modules=", "sourcecode", "ignore-missing-deps", "platform-uid="]
+    args = gopt(argv, short_opts, long_opts)
+
+    opts = dict(args[0])
+    pargs = args[1]
+
+    if len(pargs) == 0:
+        raise ValueError("no source file name given")
+
+    # Override character encoding of command line and filesystem.
+    encs = opts.get("--encoding", opts.get("-e", "%s,%s" % (terminalenc,
+                                                            filesystemenc)))
+    try:
+        terminalenc, filesystemenc = encs.split(",")
+    except (ValueError, TypeError):
+        raise ValueError("invalid encoding string '%s'" % encs)
+
+    # Determine if debug output is requested.
+    if "--debug" in opts.keys():
+        # Enable debug output for OpenSSL-related functions.
+        import cryptutil
+        cryptutil.setdebug(True)
+        module_repo.debug = True
+
+    module_repo.debug_log = open("debug.txt", "w")
+
+    # Check if ignore-missing-deps flag is set. If not then abort sis
+    # generation printing the missing dependencies as errors.
+    if "--ignore-missing-deps" in opts.keys() or "-I" in opts.keys():
+        module_repo.ignore_missing_deps = True
+
+    # If sourcecode option is set then the application is packaged as source
+    # code. By default it is packaged as bytecode.
+    bytecode = True
+    if "--sourcecode" in opts.keys() or "-S" in opts.keys():
+        bytecode = False
+
+    # Get source name, either a Python program or a directory.
+    src = pargs[0].decode(terminalenc).encode(filesystemenc)
+
+    extrasdir = opts.get("--extrasdir", opts.get("-x", None))
+    if extrasdir != None:
+        extrasdir = extrasdir.decode(terminalenc).encode(filesystemenc)
+        if extrasdir[-1] == os.sep:
+            # Strip trailing slash (or backslash).
+            extrasdir = extrasdir[:-1]
+
+        if os.sep in extrasdir:
+            raise ValueError("%s: too many path components" % extrasdir)
+        if not os.path.isdir(src):
+            raise RuntimeError("extrasdir option can only be used when the" +
+                               " source is a directory")
+        if not os.path.isdir(os.path.join(os.path.abspath(src), extrasdir)):
+            raise RuntimeError("Directory specified using --extrasdir" +\
+                               " option does not exist")
+
+    # Get the profile in which the  python script should be executed - OpenC
+    # console mode or s60ui mode
+    profile = opts.get("--profile", opts.get("-P", "s60ui"))
+    if profile not in ['console', 's60ui']:
+        raise ValueError("Invalid profile. Set either console or s60ui")
+
+    # Check if Python core modules take priority over PyS60 modules
+    mode = opts.get("--mode", opts.get("-m", "pycore"))
+    if mode not in ['pycore', 'pys60']:
+        raise ValueError("Invalid mode. Set either pys60 or pycore")
+
+    # Get the S60 platform uid of the devices on which the Python
+    # application is supported
+    platform_uid = opts.get("--platform-uid", "0x101f7961,0x1028315F")
+
+    # Extra module(s) to be packaged with application sis
+    extra_modules = opts.get("--extra-modules", opts.get("-o", None))
+
+    # module_repo.get_dependency_list returns a map with the following format:
+    # {'repo': [<dependency list of standard repo modules>],
+    #  'dev': [<dependency list of dev modules>]}
+    extra_modules_map = module_repo.get_dependency_list(src, extra_modules)
+
+    if mode == 'pys60':
+        # Add calendar.py and socket.py wrappers to app's private directory
+        conflicting_modules = {'calendar': 'e32calendar', 'socket': 'btsocket'}
+
+        for module in conflicting_modules:
+            if module in extra_modules_map[module_repo.std_repo_module]:
+                extra_modules_map[module_repo.std_repo_module].remove(module)
+                extra_modules_map[module_repo.dev_repo_module].append(
+                                                   conflicting_modules[module])
+
+    tmpdir_suffix = '_' + time.strftime("%H%M%S")
+
+    if not os.path.isdir(src):
+        # app is a file. Create app directory, rename app file to
+        # default.py, and add dependency
+        srcdir, srcfile = os.path.split(src)
+        appdir = os.path.join(srcdir, srcfile[:-3] + tmpdir_suffix)
+        os.mkdir(appdir)
+        shutil.copy(src, appdir)
+        os.rename(os.path.join(appdir, srcfile),
+                  os.path.join(appdir, "default.py"))
+        src = appdir
+    else:
+        module_repo.debug_print("Copying '%s' to '%s' " %
+              (os.path.abspath(src), os.path.abspath(src) + tmpdir_suffix))
+        shutil.copytree(os.path.abspath(src),
+                        os.path.abspath(src) + tmpdir_suffix)
+        src += tmpdir_suffix
+        appdir = src
+    # appdir should be deleted if there is any exception during packaging
+    try:
+        if extra_modules_map:
+            module_repo.debug_print("Extra modules list:" + str(extra_modules_map))
+            module_repo.appdir = appdir
+            module_repo.extrasdir = extrasdir
+            dep_module_paths = module_repo.search_module(extra_modules_map)
+            if module_repo.error_count != 0:
+                raise RuntimeError(str(module_repo.error_count) +\
+                                   " dependency files not found")
+            module_repo.process_dependent_modules(dep_module_paths)
+
+            extrasdir = module_repo.extrasdir
+
+        if os.path.isdir(src):
+            # Add calendar.py and socket.py wrappers to app's lib.zip
+            conflicting_modules = {'calendar_py': 'calendar.py',
+                                   'socket_py': 'socket.py'}
+            if mode == 'pys60':
+                for module in conflicting_modules:
+                    module_repo.debug_print("Adding socket & calendar " +
+                                            "wrappers")
+                    shutil.copy(
+                        os.path.join("templates", conflicting_modules[module]),
+                                os.path.join(src, conflicting_modules[module]))
+            # All the py[c|o] files in the app directory except for default.py
+            # are zipped into lib.zip. This file is added to sys.path by
+            # launcher.py
+            py_ignore_list = []
+            lib_zip = zipfile.ZipFile(os.path.join(src,
+                                      "lib.zip"), "w", zipfile.ZIP_DEFLATED)
+
+            def process_bytecode(dirpath, name, file_ext):
+                # Process the files to be written to the lib_zip based on the
+                # `bytecode` option
+                if not bytecode or file_ext in ['.pyc', '.pyo']:
+                    final_filename = name + file_ext
+                elif bytecode and file_ext == '.py':
+                    if imp.get_magic() != pys60_magic_number:
+                        raise RuntimeError("Python Version on \
+                        the host system not bytecode compatible with \
+                        the Python version used in PyS60")
+                    py_compile.compile(os.path.join(dirpath, name + file_ext))
+                    # Compilation can result in either a pyc or a pyo.
+                    for ext in ['.pyc', '.pyo']:
+                        if os.path.exists(os.path.join(dirpath, name + ext)):
+                            final_filename = name + ext
+
+                return final_filename
+
+            for dirpath, dirs, files in os.walk(src):
+                if extrasdir in dirs:
+                    dirs.remove(extrasdir)
+                for filename in files:
+                    name, file_ext = os.path.splitext(os.path.basename(
+                                                      filename))
+                    file_ext = file_ext.lower()
+                    if file_ext == '.py':
+                        for ext in ['.pyc', '.pyo']:
+                            if os.path.exists(os.path.join(dirpath,
+                                                           name + ext)):
+                                os.remove(os.path.join(dirpath, name + ext))
+                                files.remove(name + ext)
+
+                    if file_ext in ['.py', '.pyc', '.pyo'] and \
+                       filename != 'default.py':
+                        final_filename = process_bytecode(dirpath, name,
+                                                          file_ext)
+                        relative_path = \
+                            os.path.join(dirpath, final_filename).split(
+                                         os.path.basename(src) + os.sep)[-1]
+                        module_repo.debug_print("Adding %s to lib.zip as %s" %\
+                            (os.path.join(src, relative_path), relative_path))
+                        lib_zip.write(os.path.join(src, relative_path),
+                                      relative_path)
+                        if extra_modules_map:
+                            # After copying the files to the lib_zip delete
+                            # them otherwise they too will find their way into
+                            # the zip.
+                            os.remove(os.path.join(src, relative_path))
+                            if bytecode and file_ext == '.py':
+                                # The `py` files which will be compiled will
+                                # also have to be deleted.
+                                os.remove(os.path.join(dirpath, filename))
+                        else:
+                            py_ignore_list.append(relative_path)
+
+            lib_zip.close()
+            if not len(lib_zip.infolist()):
+                # Delete the lib_zip if it is empty
+                os.remove(os.path.join(src, "lib.zip"))
+
+            # Remove trailing slashes (or whatever the separator is).
+            src = os.path.split(src + os.sep)[0]
+
+            # Use last directory component as the name.
+            basename = os.path.basename(src)
+
+            # Source is a directory, recursively collect files it contains.
+            srcdir = src
+            srcfiles = []
+            prefixlen = len(srcdir) + len(os.sep)
+            def getfiles(arg, dirname, names):
+                for name in names:
+                    path = os.path.join(dirname, name)
+                    if not os.path.isdir(path) and \
+                                        path[prefixlen:] not in py_ignore_list:
+                        arg.append(path[prefixlen:])
+            os.path.walk(srcdir, getfiles, srcfiles)
+
+            # Read application version and UID3 from default.py.
+            version, uid3 = scandefaults(os.path.join(srcdir, "default.py"))
+        else:
+            if src.lower().endswith(".py"):
+                # Use program name without the .py extension.
+                basename = os.path.basename(src)[:-3]
+            else:
+                # Unknown extension, use program name as-is.
+                basename = os.path.basename(src)
+
+            # Source is a file, use it.
+            srcdir, srcfiles = os.path.split(src)
+            srcfiles = [srcfiles]
+
+            # Read application version and UID3 from file.
+            version, uid3 = scandefaults(os.path.join(srcdir, srcfiles[0]))
+
+        # The sis file name should not have the tmpdir_suffix appended to src
+        basename = basename.rsplit(tmpdir_suffix, 1)[0]
+
+        # Parse version string, use 1.0.0 by default.
+        version = opts.get("--version", opts.get("-r", version))
+        if version == None:
+            version = "1.0.0"
+            print ("%s: warning: no application version given, "
+                   "using %s" % (pgmname, version))
+        try:
+            version = parseversion(version)
+        except (ValueError, IndexError, TypeError):
+            raise ValueError("invalid version string '%s'" % version)
+
+        # Determine output SIS file name.
+        if len(pargs) == 1:
+            # Derive output file name from input file name.
+            outfile = "%s_v%d_%d_%d.sis" % (basename, version[0],
+                                            version[1], version[2])
+        elif len(pargs) == 2:
+            outfile = pargs[1].decode(terminalenc).encode(filesystemenc)
+            if os.path.isdir(outfile):
+                # Output to directory, derive output name from input file name.
+                outfile = os.path.join(outfile, "%s_v%d_%d_%d.sis" % (
+                    basename, version[0], version[1], version[2]))
+            if not outfile.lower().endswith(".sis"):
+                outfile += ".sis"
+        else:
+            raise ValueError("wrong number of arguments")
+
+        # Determine application name (install dir.), use basename by default.
+        appname = opts.get("--appname", opts.get("-n", basename))
+        appname = appname.decode(terminalenc)
+
+        # Auto-generate a test-range UID from application name.
+        autouid = symbianutil.uidfromname(appname)
+
+        # Get UID3.
+        uid3 = opts.get("--uid", opts.get("-u", uid3))
+        if uid3 == None:
+            # No UID given, use auto-generated UID.
+            uid3 = autouid
+            print ("%s: warning: no UID given, using auto-generated "
+                   "test-range UID 0x%08x" % (pgmname, uid3))
+        elif uid3.lower().startswith("0x"):
+            # Prefer hex UIDs with leading "0x".
+            uid3 = long(uid3, 16)
+        else:
+            try:
+                if len(uid3) == 8:
+                    # Assuming hex UID even without leading "0x".
+                    print ('%s: warning: assuming hex UID even '
+                           'without leading "0x"' % pgmname)
+                    uid3 = long(uid3, 16)
+                else:
+                    # Decimal UID.
+                    uid3 = long(uid3)
+                    print ('%s: warning: decimal UID converted to 0x%08x' %
+                           (pgmname, uid3))
+            except ValueError:
+                raise ValueError("invalid UID string '%s'" % uid3)
+
+        # Warn against specifying a test-range UID manually.
+        if uid3 & 0xf0000000L == 0xe0000000L and uid3 != autouid:
+            print ("%s: warning: manually specifying a test-range UID is "
+                   "not recommended" % pgmname)
+
+        # Determine application language(s), use "EN" by default.
+        lang = opts.get("--lang", opts.get("-l", "EN")).split(",")
+        numlang = len(lang)
+
+        # Verify that the language codes are correct.
+        for l in lang:
+            try:
+                symbianutil.langidtonum[l]
+            except KeyError:
+                raise ValueError("%s: no such language code" % l)
+
+        # Get icon file name.
+        icon = opts.get("--icon", opts.get("-i", None))
+        if icon != None:
+            icon = icon.decode(terminalenc).encode(filesystemenc)
+
+            # Read icon file.
+            f = file(icon, "rb")
+            icondata = f.read(MAXICONFILESIZE + 1)
+            f.close()
+
+            if len(icondata) > MAXICONFILESIZE:
+                raise ValueError("icon file too large")
+        else:
+            # No icon given, use a default icon.
+            icondata = zlib.decompress(defaulticondata.decode("base-64"))
+
+        # Determine application short caption(s).
+        shortcaption = opts.get("--shortcaption", opts.get("-s", ""))
+        shortcaption = shortcaption.decode(terminalenc)
+        if len(shortcaption) == 0:
+            # Short caption not given, use application name.
+            shortcaption = [appname] * numlang
+        else:
+            shortcaption = shortcaption.split(",")
+
+        # Determine application long caption(s), use short caption by default.
+        caption = opts.get("--caption", opts.get("-c", ""))
+        caption = caption.decode(terminalenc)
+        if len(caption) == 0:
+            # Caption not given, use short caption.
+            caption = shortcaption
+        else:
+            caption = caption.split(",")
+
+        # Compare the number of languages and captions.
+        if len(shortcaption) != numlang or len(caption) != numlang:
+            raise ValueError("invalid number of captions")
+
+        # Determine installation drive, any by default.
+        drive = opts.get("--drive", opts.get("-f", "any")).upper()
+        if drive == "ANY" or drive == "!":
+            drive = "!"
+        elif drive != "C" and drive != "E":
+            raise ValueError("%s: invalid drive letter" % drive)
+
+        # Determine vendor name(s), use "Ensymble" by default.
+        vendor = opts.get("--vendor", opts.get("-d", "Ensymble"))
+        vendor = vendor.decode(terminalenc)
+        vendor = vendor.split(",")
+        if len(vendor) == 1:
+            # Only one vendor name given, use it for all languages.
+            vendor = vendor * numlang
+        elif len(vendor) != numlang:
+            raise ValueError("invalid number of vendor names")
+
+        # Load text files.
+        texts = []
+        textfile = opts.get("--textfile", opts.get("-t", None))
+        if textfile != None:
+            texts = readtextfiles(textfile, lang)
+
+        # Get certificate and its private key file names.
+        cert = opts.get("--cert", opts.get("-a", None))
+        privkey = opts.get("--privkey", opts.get("-k", None))
+        if cert != None and privkey != None:
+            # Convert file names from terminal encoding to filesystem encoding.
+            cert = cert.decode(terminalenc).encode(filesystemenc)
+            privkey = privkey.decode(terminalenc).encode(filesystemenc)
+
+            # Read certificate file.
+            f = file(cert, "rb")
+            certdata = f.read(MAXCERTIFICATELENGTH + 1)
+            f.close()
+
+            if len(certdata) > MAXCERTIFICATELENGTH:
+                raise ValueError("certificate file too large")
+
+            # Read private key file.
+            f = file(privkey, "rb")
+            privkeydata = f.read(MAXPRIVATEKEYLENGTH + 1)
+            f.close()
+
+            if len(privkeydata) > MAXPRIVATEKEYLENGTH:
+                raise ValueError("private key file too large")
+        elif cert == None and privkey == None:
+            # No certificate given, use the Ensymble default certificate.
+            # defaultcert.py is not imported when not needed. This speeds
+            # up program start-up a little.
+            import defaultcert
+            certdata = defaultcert.cert
+            privkeydata = defaultcert.privkey
+
+            print ("%s: warning: no certificate given, using "
+                   "insecure built-in one" % pgmname)
+
+            # Warn if the UID is in the protected range.
+            # Resulting SIS file will probably not install.
+            if uid3 < 0x80000000L:
+                print ("%s: warning: UID is in the protected range "
+                       "(0x00000000 - 0x7ffffff)" % pgmname)
+        else:
+            raise ValueError("missing certificate or private key")
+
+        # Get pass phrase. Pass phrase remains in terminal encoding.
+        passphrase = opts.get("--passphrase", opts.get("-p", None))
+        if passphrase == None and privkey != None:
+            # Private key given without "--passphrase" option, ask it.
+            if sys.stdin.isatty():
+                # Standard input is a TTY, ask password interactively.
+                passphrase = getpass.getpass("Enter private key pass phrase:")
+            else:
+                # Not connected to a TTY, read stdin non-interactively instead.
+                passphrase = sys.stdin.read(MAXPASSPHRASELENGTH + 1)
+
+                if len(passphrase) > MAXPASSPHRASELENGTH:
+                    raise ValueError("pass phrase too long")
+
+                passphrase = passphrase.strip()
+
+        # Get capabilities and normalize the names.
+        caps = opts.get("--caps", opts.get("-b",
+         "LocalServices+NetworkServices+ReadUserData+WriteUserData+" +
+         "UserEnvironment"))
+        capmask = symbianutil.capstringtomask(caps)
+        caps = symbianutil.capmasktostring(capmask, True)
+
+        # Determine if the application is requested to start on each device
+        # boot.
+        autostart = False
+        if "--autostart" in opts.keys() or "-g" in opts.keys():
+            autostart = True
+
+        runinstall = False
+        if "--runinstall" in opts.keys() or "-R" in opts.keys():
+            runinstall = True
+
+        # Get heap sizes.
+        heapsize = \
+               opts.get("--heapsize", opts.get("-H", "100K,4M")).split(",", 1)
+        try:
+            heapsizemin = symbianutil.parseintmagnitude(heapsize[0])
+            if len(heapsize) == 1:
+                # Only one size given, use it as both.
+                heapsizemax = heapsizemin
+            else:
+                heapsizemax = symbianutil.parseintmagnitude(heapsize[1])
+        except (ValueError, TypeError, IndexError):
+            raise ValueError(
+                        "%s: invalid heap size, one or two values expected" %
+                             ",".join(heapsize))
+
+        # Warn if the minimum heap size is larger than the maximum heap size.
+        # Resulting SIS file will probably not install.
+        if heapsizemin > heapsizemax:
+            print ("%s: warning: minimum heap size larger than "
+                   "maximum heap size" % pgmname)
+
+        # Determine verbosity.
+        verbose = False
+        if "--verbose" in opts.keys() or "-v" in opts.keys():
+            verbose = True
+
+
+        # Ingredients for successful SIS generation:
+        #
+        # terminalenc   Terminal character encoding (autodetected)
+        # filesystemenc File system name encoding (autodetected)
+        # basename      Base for generated file names on host, filesystemenc encoded
+        # srcdir        Directory of source files, filesystemenc encoded
+        # srcfiles      List of filesystemenc encoded source file names in srcdir
+        # outfile       Output SIS file name, filesystemenc encoded
+        # uid3          Application UID3, long integer
+        # appname       Application name and install directory in device, in Unicode
+        # version       A triple-item tuple (major, minor, build)
+        # lang          List of two-character language codes, ASCII strings
+        # icon          Icon data, a binary string typically containing a SVG-T file
+        # shortcaption  List of Unicode short captions, one per language
+        # caption       List of Unicode long captions, one per language
+        # drive         Installation drive letter or "!"
+        # extrasdir     Path prefix for extra files, filesystemenc encoded or None
+        # textfile      File name pattern of text file(s) to display during install
+        # texts         Actual texts to display during install, one per language
+        # cert          Certificate in PEM format
+        # privkey       Certificate private key in PEM format
+        # passphrase    Pass phrase of private key, terminalenc encoded string
+        # caps, capmask Capability names and bitmask
+        # vendor        List of Unicode vendor names, one per language
+        # autostart     Boolean requesting application autostart on device boot
+        # runinstall    Boolean requesting application autorun after installation
+        # heapsizemin   Heap that must be available for the application to start
+        # heapsizemax   Maximum amount of heap the application can allocate
+        # verbose       Boolean indicating verbose terminal output
+        # profile       console/s60ui stub exe to be packaged with script
+        # mode          Selects the module to be packaged either from Python core
+        #               or PyS60
+        # extra-modules Additional dependency modules that should be packaged with
+        #               the application
+
+        if verbose:
+            print
+            print "Input file(s)       %s"      % " ".join(
+                [s.decode(filesystemenc).encode(terminalenc) for s in srcfiles])
+            print "Output SIS file     %s"      % (
+                outfile.decode(filesystemenc).encode(terminalenc))
+            print "UID                 0x%08x"  % uid3
+            print "Application name    %s"      % appname.encode(terminalenc)
+            print "Version             %d.%d.%d"    % (
+                version[0], version[1], version[2])
+            print "Language(s)         %s"      % ", ".join(lang)
+            print "Icon                %s"      % ((icon and
+                icon.decode(filesystemenc).encode(terminalenc)) or "<default>")
+            print "Short caption(s)    %s"      % ", ".join(
+                [s.encode(terminalenc) for s in shortcaption])
+            print "Long caption(s)     %s"      % ", ".join(
+                [s.encode(terminalenc) for s in caption])
+            print "Install drive       %s"      % ((drive == "!") and
+                "<any>" or drive)
+            print "Extras directory    %s"      % ((extrasdir and
+                extrasdir.decode(filesystemenc).encode(terminalenc)) or "<none>")
+            print "Text file(s)        %s"      % ((textfile and
+                textfile.decode(filesystemenc).encode(terminalenc)) or "<none>")
+            print "Certificate         %s"      % ((cert and
+                cert.decode(filesystemenc).encode(terminalenc)) or "<default>")
+            print "Private key         %s"      % ((privkey and
+                privkey.decode(filesystemenc).encode(terminalenc)) or "<default>")
+            print "Capabilities        0x%x (%s)" % (capmask, caps)
+            print "Vendor name(s)      %s"      % ", ".join(
+                [s.encode(terminalenc) for s in vendor])
+            print "Autostart on boot   %s"      % ((autostart and "Yes") or "No")
+            print "Run after install   %s"      % ((runinstall and "Yes") or "No")
+            print "Heap size in bytes  %d, %d" % (heapsizemin, heapsizemax)
+            print "Profile             %s"      % profile
+            print "Mode                %s"      % mode
+            print "Extra Modules       %s"      % extra_modules_map
+            print
+
+        # Generate SimpleSISWriter object.
+        sw = sisfile.SimpleSISWriter(lang, caption, uid3, version,
+                                     vendor[0], vendor)
+
+        # Add text file or files to the SIS object. Text dialog is
+        # supposed to be displayed before anything else is installed.
+        if len(texts) == 1:
+            sw.addfile(texts[0], operation = sisfield.EOpText)
+        elif len(texts) > 1:
+            sw.addlangdepfile(texts, operation = sisfield.EOpText)
+
+        # Generate "Python for S60" resource file.
+        rsctarget = u"%s:\\resource\\apps\\%s_0x%08x.rsc" % (drive, appname, uid3)
+        string = zlib.decompress(pythons60rscdata.decode("base-64"))
+        sw.addfile(string, rsctarget)
+        del string
+
+        # Generate application registration resource file.
+        regtarget = u"%s:\\private\\10003a3f\\import\\apps\\%s_0x%08x_reg.rsc" % (
+            drive, appname, uid3)
+        exename = u"%s_0x%08x" % (appname, uid3)
+        locpath = u"\\resource\\apps\\%s_0x%08x_loc" % (appname, uid3)
+        rw = rscfile.RSCWriter(uid2 = 0x101f8021, uid3 = uid3)
+        # STRUCT APP_REGISTRATION_INFO from appinfo.rh
+        res = rscfile.Resource(["LONG", "LLINK", "LTEXT", "LONG", "LTEXT", "LONG",
+                                "BYTE", "BYTE", "BYTE", "BYTE", "LTEXT", "BYTE",
+                                "WORD", "WORD", "WORD", "LLINK"],
+                               0, 0, exename, 0, locpath, 1,
+                               0, 0, 0, 0, "", 0,
+                               0, 0, 0, 0)
+        rw.addresource(res)
+        string = rw.tostring()
+        del rw
+        sw.addfile(string, regtarget)
+        del string
+
+        # EXE target name
+        exetarget = u"%s:\\sys\\bin\\%s_0x%08x.exe" % (drive, appname, uid3)
+
+        # Generate autostart registration resource file, if requested.
+        if autostart:
+            autotarget = u"%s:\\private\\101f875a\\import\\[%08x].rsc" % (
+                drive, uid3)
+            rw = rscfile.RSCWriter(uid2 = 0, offset = "    ")
+            # STRUCT STARTUP_ITEM_INFO from startupitem.rh
+            res = rscfile.Resource(["BYTE", "LTEXT", "WORD",
+                                    "LONG", "BYTE", "BYTE"],
+                                   0, exetarget, 0, 0, 0, 0)
+            rw.addresource(res)
+            string = rw.tostring()
+            del rw
+            sw.addfile(string, autotarget)
+            del string
+
+        # Generate localisable icon/caption definition resource files.
+        iconpath = "\\resource\\apps\\%s_0x%08x_aif.mif" % (appname, uid3)
+        for n in xrange(numlang):
+            loctarget = u"%s:\\resource\\apps\\%s_0x%08x_loc.r%02d" % (
+                drive, appname, uid3, symbianutil.langidtonum[lang[n]])
+            rw = rscfile.RSCWriter(uid2 = 0, offset = "    ")
+            # STRUCT LOCALISABLE_APP_INFO from appinfo.rh
+            res = rscfile.Resource(["LONG", "LLINK", "LTEXT",
+                                    "LONG", "LLINK", "LTEXT",
+                                    "WORD", "LTEXT", "WORD", "LTEXT"],
+                                   0, 0, shortcaption[n],
+                                   0, 0, caption[n],
+                                   1, iconpath, 0, "")
+            rw.addresource(res)
+            string = rw.tostring()
+            del rw
+            sw.addfile(string, loctarget)
+            del string
+
+        # Generate MIF file for icon.
+        icontarget = "%s:\\resource\\apps\\%s_0x%08x_aif.mif" % (
+            drive, appname, uid3)
+        mw = miffile.MIFWriter()
+        mw.addfile(icondata)
+        del icondata
+        string = mw.tostring()
+        del mw
+        sw.addfile(string, icontarget)
+        del string
+        if profile == 's60ui':
+            target = "launcher.py"
+            string = open(os.path.join("templates", target), "r").read()
+            sw.addfile(string, "%s:\\private\\%08x\\%s" % (drive, uid3, target))
+            del string
+
+        # Add files to SIS object.
+        if len(srcfiles) == 1:
+            # Read file.
+            f = file(os.path.join(srcdir, srcfiles[0]), "rb")
+            string = f.read(MAXOTHERFILESIZE + 1)
+            f.close()
+
+            if len(string) > MAXOTHERFILESIZE:
+                raise ValueError("%s: input file too large" % srcfiles[0])
+
+            # Add file to the SIS object. One file only, rename it to default.py.
+            target = "default.py"
+            sw.addfile(string, "%s:\\private\\%08x\\%s" % (drive, uid3, target))
+            del string
+        else:
+            if extrasdir != None:
+                sysbinprefix = os.path.join(extrasdir, "sys", "bin", "")
+            else:
+                sysbinprefix = os.path.join(os.sep, "sys", "bin", "")
+
+            white_list = {}
+            # More than one file, use original path names.
+            for srcfile in srcfiles:
+                # Read file.
+                f = file(os.path.join(srcdir, srcfile), "rb")
+                string = f.read(MAXOTHERFILESIZE + 1)
+                f.close()
+
+                if len(string) > MAXOTHERFILESIZE:
+                    raise ValueError("%s: input file too large" % srcfile)
+
+                # Split path into components.
+                srcpathcomp = srcfile.split(os.sep)
+
+                # Check if the file is an E32Image (EXE or DLL).
+                filecapmask = symbianutil.e32imagecaps(string)
+
+                # If the DLL(PYD) has UID3 as zero, set both UID3 & SecureID
+                # to application UID3.
+                if symbianutil.ise32image(string) == 'DLL':
+                    imageinfo = symbianutil.e32imageinfo(string)
+                    if not imageinfo[2]:
+                        string = symbianutil.e32imagecrc(string, uid3=uid3,
+                                                         secureid=uid3)
+                # Warn against common mistakes when dealing with E32Image files.
+                if filecapmask != None:
+                    if not srcfile.startswith(sysbinprefix):
+                        # Warn against E32Image files outside /sys/bin.
+                        print ("%s: warning: %s is an E32Image (EXE or DLL) "
+                               "outside %s" % (pgmname, srcfile, sysbinprefix))
+                    if filecapmask != capmask:
+                        # Warn capas of dll not equal to exe. Warn before
+                        # usind the exe capas
+                        module_repo.debug_print("%s: warning: Capas of %s is not "
+                               "equal to that of the exe. Capas of the exe will be"
+                               " assigned to this pyd" % (pgmname, srcfile))
+                        string = symbianutil.e32imagecrc(string,
+                                                            capabilities=capmask)
+                        filecapmask = capmask
+
+                    srcfile_name = srcpathcomp.pop()
+                    try:
+                        file_name, file_ext = srcfile_name.split(".")
+                    except:
+                        file_ext = ""
+                    # Modify the file name if the file is a pyd and update the
+                    # white list with the new name.
+                    if srcfile.startswith(sysbinprefix) and file_ext == "pyd":
+                        srcfile_name = "%s_%08x.%s" % (file_name, uid3, file_ext)
+                        if not srcfile_name.startswith("${{PREFIX}}"):
+                            raise RuntimeError(
+                                      'PYD is not prefixed with "${{PREFIX}}"')
+                        module_name = file_name.split("${{PREFIX}}")[1]
+                        white_list[module_name] = srcfile_name.split(".pyd")[0]
+                    srcpathcomp.append(srcfile_name)
+
+                targetpathcomp = [s.decode(filesystemenc) for s in srcpathcomp]
+
+                # Handle the extras directory.
+                if extrasdir != None and extrasdir == srcpathcomp[0]:
+                    # Path is rooted at the drive root.
+                    targetfile = \
+                            u"%s:\\%s" % (drive, "\\".join(targetpathcomp[1:]))
+                else:
+                    # Path is rooted at the application private directory.
+                    targetfile = u"%s:\\private\\%08x\\%s" % (
+                            drive, uid3, "\\".join(targetpathcomp))
+
+                # Add file to the SIS object.
+                sw.addfile(string, targetfile, capabilities = filecapmask)
+                del string
+
+            # Write the white list to a file and package it
+            if white_list != {}:
+                whitelist_file = os.path.join(srcdir, "white-list.cfg")
+                whitelist_f = open(whitelist_file, "wt")
+                whitelist_f.write(repr(white_list))
+                whitelist_f.close()
+
+                string = open(whitelist_file, "rb").read()
+                sw.addfile(string, "%s:\\private\\%08x\\%s" % \
+                               (drive, uid3, os.path.basename(whitelist_file)))
+                del string
+                os.remove(whitelist_file)
+
+    ${{if INCLUDE_INTERNAL_SRC
+        # Package iad client dll
+        string = \
+              open(os.path.join("templates", "Py_iad_client.dll"), "rb").read()
+        string = symbianutil.e32imagecrc(string, uid3=uid3, secureid=uid3,
+                                         capabilities=capmask)
+        sw.addfile(
+               string, "%s:\\sys\\bin\\${{PREFIX}}Py_iad_client_0x%08x.dll" % \
+               (drive, uid3), None, capabilities = capmask)
+        del string
+    }}
+
+        # Add target device dependency.
+        platform_uids = platform_uid.split(",")
+        for platform_uid in platform_uids:
+            sw.addtargetdevice(eval(platform_uid), (0, 0, 0), None,
+                               ["Series60ProductID"] * numlang)
+
+        # Add Python runtime as dependency
+        sw.adddependency(${{PYS60_UID_CORE}}L, (${{PYS60_VERSION_MAJOR}},
+                         ${{PYS60_VERSION_MINOR}}, ${{PYS60_VERSION_MICRO}}),
+                         None, ["Python runtime"] * numlang)
+
+        # Add certificate.
+        sw.addcertificate(privkeydata, certdata, passphrase)
+
+        # Generate an EXE stub and add it to the SIS object.
+        string = ""
+        if profile == 's60ui':
+            string = \
+                  open(os.path.join("templates", "python_ui.exe"), "rb").read()
+        else:
+            string = open(os.path.join("templates", "python_console.exe"),
+                          "rb").read()
+
+        string = symbianutil.e32imagecrc(string, uid3, uid3, None,
+                                         heapsizemin, heapsizemax, capmask)
+
+        if runinstall:
+            # To avoid running without dependencies, this has to be in the end.
+            sw.addfile(string, exetarget, None, capabilities = capmask,
+                       operation = sisfield.EOpRun,
+                       options = sisfield.EInstFileRunOptionInstall)
+        else:
+            sw.addfile(string, exetarget, None, capabilities = capmask)
+
+        del string
+
+        # Generate SIS file out of the SimpleSISWriter object.
+        sw.tofile(outfile)
+    except:
+        raise
+    finally:
+        if os.path.exists(appdir):
+            shutil.rmtree(appdir)
+
+    if os.path.exists(os.path.join(src, "lib.zip")):
+        os.remove(os.path.join(src, "lib.zip"))
+    module_repo.debug_log.close()
+
+##############################################################################
+# Module-level functions which are normally only used by this module
+##############################################################################
+
+def scandefaults(filename):
+    '''Scan a Python source file for application version string and UID3.'''
+
+    version = None
+    uid3    = None
+
+    # Regular expression for the version string. Version may optionally
+    # be enclosed in double or single quotes.
+    version_ro = re.compile(r'SIS_VERSION\s*=\s*(?:(?:"([^"]*)")|'
+                            r"(?:'([^']*)')|(\S+))")
+
+    # Original py2is uses a regular expression
+    # r"SYMBIAN_UID\s*=\s*(0x[0-9a-fA-F]{8})".
+    # This version is a bit more lenient.
+    uid3_ro = re.compile(r"SYMBIAN_UID\s*=\s*(\S+)")
+
+    # First match of each regular expression is used.
+    f = file(filename, "rb")
+    try:
+        while version == None or uid3 == None:
+            line = f.readline()
+            if line == "":
+                break
+            if version == None:
+                mo = version_ro.search(line)
+                if mo:
+                    # Get first group that matched in the regular expression.
+                    version = filter(None, mo.groups())[0]
+            if uid3 == None:
+                mo = uid3_ro.search(line)
+                if mo:
+                    uid3 = mo.group(1)
+    finally:
+        f.close()
+    return version, uid3
+
+def parseversion(version):
+    '''Parse a version string: "v1.2.3" or similar.
+
+    Initial "v" can optionally be a capital "V" or omitted altogether. Minor
+    and build numbers can also be omitted. Separator can be a comma or a
+    period.'''
+
+    version = version.strip().lower()
+
+    # Strip initial "v" or "V".
+    if version[0] == "v":
+        version = version[1:]
+
+    if "." in version:
+        parts = [int(n) for n in version.split(".")]
+    else:
+        parts = [int(n) for n in version.split(",")]
+
+    # Allow missing minor and build numbers.
+    parts.extend([0, 0])
+
+    return parts[0:3]
+
+def readtextfiles(pattern, languages):
+    '''Read language dependent text files.
+
+    Files are assumed to be in UTF-8 encoding and re-encoded
+    in UCS-2 (UTF-16LE) for Symbian OS to display during installation.'''
+
+    if "%" not in pattern:
+        # Only one file, read it.
+        filenames = [pattern]
+    else:
+        filenames = []
+        for langid in languages:
+            langnum  = symbianutil.langidtonum[langid]
+            langname = symbianutil.langnumtoname[langnum]
+
+            # Replace formatting characters in file name pattern.
+            filename = pattern
+            filename = filename.replace("%n", "%02d" % langnum)
+            filename = filename.replace("%c", langid.lower())
+            filename = filename.replace("%C", langid.upper())
+            filename = filename.replace("%l", langname.lower())
+            filename = filename.replace("%L", langname)
+            filename = filename.replace("%%", "%")
+
+            filenames.append(filename)
+
+    texts = []
+
+    for filename in filenames:
+        f = file(filename, "r") # Read as text.
+        text = f.read(MAXTEXTFILELENGTH + 1)
+        f.close()
+
+        if len(text) > MAXTEXTFILELENGTH:
+            raise ValueError("%s: text file too large" % filename)
+
+        texts.append(text.decode("UTF-8").encode("UTF-16LE"))
+
+    return texts
+
+##############################################################################
+# Embedded data: Icon and application resource
+##############################################################################
+
+# Python logo as a base-64-encoded, zlib-compressed SVG XML data
+defaulticondata = '''
+    eJyFVF1v20YQfC/Q/3Bl0be74+3tfQZRA1h24gJJa6COij66EiMSdSVDUiW3vz5zRyp2CgMVLHrJ
+    /ZjZmRNfv3n8614cu91+2G5mDWnTiG6z3K6GzXrWfLx9q1Lz5sdvv3n93eUv89vfb67E/rgWNx8v
+    3v80F41q29943raXt5fi18U7QZrE7bD5p22vfm5E0x8OD6/a9nQ66RPr7W7dvtvdPfTDct+iukV1
+    6WwxkUgd0KdXh1VT0ArIH3f77ma3/TTcd7OmZJvnPKkRYL7Zv9qD6wO+szPc+YHeb//eLbtPwO30
+    pjuMWFNSmYo1zpi9wNQaYwqzM8zj/bD586VCyjm3NduI07A69GBnzA+N6Lth3R/Od8ehO11sH2eN
+    EUYEh7+66LpcHu4OvcCe97Pmew4hZ9eI1az5QEln5yVZ7YxfGsXaJyeNzoGU156dDNqGpIJ2gZes
+    g2HsFZhk0tZaxJFKt8cTI4RAiTOMAT7Y2pola5PjFNcxC+u05aVBxmG01TERMkzqXMR0bb22ZJcK
+    pd5Ko6JOHNERbJjiqKP1R69DdD3K2OSCjw2CwwZgH0PA8GAL++DLlbGjIm2NRUN2CMlTGVd2Vlgj
+    EETQOSfkyUaJa5oaZUHlMe6djoavmbRLR0zxsWBfj2IuRjHffyXtv037Xxuu4oVnM9rgnDZkpTfa
+    ulSVgQ1YhYik15zTkzRlBcC7LElz8CpBaliATYJ6bgS6mbwqVgY1mmh15qzOhmLSgpN21lbfnbHS
+    FmFLir7YztSPU5fQIkKmqkMsMpswxUVAeyznhQKkwekaT0JwCfXgHyJGR5qmTlvAB89QOOdCH/bh
+    SEVbECYjilOoZh1jqka6sVM9m9KPN5MVxYkE7InyYtTzBe3f1s+ovbXaRKhJQIASVLbHS8plYDJw
+    cPVjWChnD4K4q/obn6a45svWpu7iVUm6+pjVUwnPLUy1SRLrnFieseGM9fI5k/8hzQFuZOkBwzyy
+    xhGtoJWre6LtKu080q41YYxq8olzrpypPo7qS0Wcc8TPFYcTZ0SecctKVn7FYmLc1vdNea/h/2dD
+    N2YO'''
+
+# "Python for S60" compiled resource as a base-64-encoded, zlib-compressed data
+pythons60rscdata = '''
+    eJzL9pIXYACCVnFWhouea4oYtRk4QHwWIGYMqAgEs6E0CEgxnOGAsRnYGRlYgXKcnK4VJal5xZn5
+    eYJg8f9AwDDkgQSDAhDaMCQypDPkMhQzVDLUM7QydDNMZJjOMJdhMcNKhvUMWxl2MxxkOM5wluEy
+    w02G+wxPGV4zfGT4zvCXgZmRk5GfUZRRmhEAjnEjdg=='''

@@ -1,0 +1,325 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html;charset=utf-8">
+<TITLE>The Ensymble developer utilities for Symbian OS - Archives</TITLE>
+</HEAD>
+<BODY>
+
+<H1>The Ensymble developer utilities for Symbian OS - Archives</H1>
+
+Back to <A HREF="ensymble.html">main page</A>.
+
+<H2>Download</H2>
+
+Ensymble pre-<A HREF="http://effbot.org/zone/squeeze.htm">squeezed</A> versions
+are ready to use. Just copy the file to a suitable place (on command search
+path) and start using it!
+
+<H3>Older versions</H3>
+
+v0.26 2008-01-27
+<UL>
+<LI>Source:
+<A HREF="ensymble-0.26.tar.gz">ensymble-0.26.tar.gz</A> (92 kB)</LI>
+<LI>Pre-squeezed version for Python v2.2:
+<A HREF="ensymble_python2.2-0.26.py">ensymble_python2.2-0.26.py</A> (91 kB)</LI>
+<LI>Pre-squeezed version for Python v2.3:
+<A HREF="ensymble_python2.3-0.26.py">ensymble_python2.3-0.26.py</A> (81 kB)</LI>
+<LI>Pre-squeezed version for Python v2.4:
+<A HREF="ensymble_python2.4-0.26.py">ensymble_python2.4-0.26.py</A> (78 kB)</LI>
+<LI>Pre-squeezed version for Python v2.5:
+<A HREF="ensymble_python2.5-0.26.py">ensymble_python2.5-0.26.py</A> (76 kB)</LI>
+<LI>Documentation:
+<A HREF="README-0.26.txt">README-0.26.txt</A> (40 kB)</LI>
+</UL>
+<P>
+Changes:
+<UL>
+<LI>Incorporated a --runinstall option for the py2sis command, developed by
+Jari Kirma.</LI>
+<LI>Commands mergesis and signsis no longer choke on extra bytes in input SIS
+files, the bytes are simply discarded. PyS60 v1.4.2 SIS file from Nokia
+contains 1272 extra bytes. Purpose of these bytes is not known at this time
+and removing them seems to have no effect.</LI>
+</UL>
+
+v0.25 2007-12-15
+<UL>
+<LI>Source:
+<A HREF="ensymble-0.25.tar.gz">ensymble-0.25.tar.gz</A> (92 kB)</LI>
+<LI>Pre-squeezed version for Python v2.2:
+<A HREF="ensymble_python2.2-0.25.py">ensymble_python2.2-0.25.py</A> (90 kB)</LI>
+<LI>Pre-squeezed version for Python v2.3:
+<A HREF="ensymble_python2.3-0.25.py">ensymble_python2.3-0.25.py</A> (80 kB)</LI>
+<LI>Pre-squeezed version for Python v2.4:
+<A HREF="ensymble_python2.4-0.25.py">ensymble_python2.4-0.25.py</A> (78 kB)</LI>
+<LI>Pre-squeezed version for Python v2.5:
+<A HREF="ensymble_python2.5-0.25.py">ensymble_python2.5-0.25.py</A> (76 kB)</LI>
+<LI>Documentation:
+<A HREF="README-0.25.txt">README-0.25.txt</A> (39 kB)</LI>
+</UL>
+<P>
+Changes:
+<UL>
+<LI>Added --drive option to py2sis and simplesis commands,
+for setting the installation drive.</LI>
+<LI>Added --vendor option for the simplesis command, like already
+implemented for the py2sis command.</LI>
+<LI>The OpenSSL command line tool can reside in the same directory
+as Ensymble now. This allows simpler Windows installation.</LI>
+<LI>Prevent leaving zero-byte output files behind when no
+OpenSSL tool is found.</LI>
+<LI>Made it possible to use numeric capability bitmasks.</LI>
+<LI>Rewrote <A HREF="README-0.25.txt">installation instructions</A>
+to better take Windows users into account.</LI>
+</UL>
+
+v0.24 2007-10-18
+<UL>
+<LI>Source:
+<A HREF="ensymble-0.24.tar.gz">ensymble-0.24.tar.gz</A> (92 kB)</LI>
+<LI>Pre-squeezed version for Python v2.2:
+<A HREF="ensymble_python2.2-0.24.py">ensymble_python2.2-0.24.py</A> (90 kB)</LI>
+<LI>Pre-squeezed version for Python v2.3:
+<A HREF="ensymble_python2.3-0.24.py">ensymble_python2.3-0.24.py</A> (80 kB)</LI>
+<LI>Pre-squeezed version for Python v2.4:
+<A HREF="ensymble_python2.4-0.24.py">ensymble_python2.4-0.24.py</A> (77 kB)</LI>
+<LI>Pre-squeezed version for Python v2.5:
+<A HREF="ensymble_python2.5-0.24.py">ensymble_python2.5-0.24.py</A> (75 kB)</LI>
+<LI>Documentation:
+<A HREF="README-0.24.txt">README-0.24.txt</A> (37 kB)</LI>
+</UL>
+<P>
+Changes:
+<UL>
+<LI>Added --autostart option to the py2sis command, like in the
+official py2sis.</LI>
+<LI>Added --vendor option to the py2sis command for setting the vendor name
+shown during SIS installation.</LI>
+<LI>Added infoe32 command for inspecting Symbian OS e32image files (EXEs, DLLs),
+contributed by <A HREF="http://www.martin.st/software/">Martin Storsjö</A>.</LI>
+</UL>
+
+v0.23 2007-07-16
+<UL>
+<LI>Source:
+<A HREF="ensymble-0.23.tar.gz">ensymble-0.23.tar.gz</A> (89 kB)</LI>
+<LI>Pre-squeezed version for Python v2.2:
+<A HREF="ensymble_python2.2-0.23.py">ensymble_python2.2-0.23.py</A> (88 kB)</LI>
+<LI>Pre-squeezed version for Python v2.3:
+<A HREF="ensymble_python2.3-0.23.py">ensymble_python2.3-0.23.py</A> (78 kB)</LI>
+<LI>Pre-squeezed version for Python v2.4:
+<A HREF="ensymble_python2.4-0.23.py">ensymble_python2.4-0.23.py</A> (76 kB)</LI>
+<LI>Pre-squeezed version for Python v2.5:
+<A HREF="ensymble_python2.5-0.23.py">ensymble_python2.5-0.23.py</A> (75 kB)</LI>
+<LI>Documentation:
+<A HREF="README-0.23.txt">README-0.23.txt</A> (35 kB)</LI>
+</UL>
+<P>
+Changes:
+<UL>
+<LI>Python for S60 changed its UID due to Nokia finally signing it,
+so Ensymble uses the new UID from now on as an installation time
+dependency.</LI>
+<LI>Clarified README in using embedded version and UID strings with
+the py2sis command.</LI>
+</UL>
+
+v0.22 2007-02-08
+<UL>
+<LI>Source:
+<A HREF="ensymble-0.22.tar.gz">ensymble-0.22.tar.gz</A> (84 kB)</LI>
+<LI>Pre-squeezed version for Python v2.2:
+<A HREF="ensymble_python2.2-0.22.py">ensymble_python2.2-0.22.py</A> (88 kB)</LI>
+<LI>Pre-squeezed version for Python v2.3:
+<A HREF="ensymble_python2.3-0.22.py">ensymble_python2.3-0.22.py</A> (78 kB)</LI>
+<LI>Pre-squeezed version for Python v2.4:
+<A HREF="ensymble_python2.4-0.22.py">ensymble_python2.4-0.22.py</A> (76 kB)</LI>
+<LI>Pre-squeezed version for Python v2.5:
+<A HREF="ensymble_python2.5-0.22.py">ensymble_python2.5-0.22.py</A> (75 kB)</LI>
+<LI>Documentation:
+<A HREF="README-0.22.txt">README-0.22.txt</A> (34 kB)</LI>
+</UL>
+<P>
+Changes:
+<UL>
+<LI>Added simplesis command for creating a SIS package out of a directory structure.</LI>
+<LI>Added maximum file size sanity check for py2sis command.</LI>
+</UL>
+
+v0.21 2007-02-01
+<UL>
+<LI>Source:
+<A HREF="ensymble-0.21.tar.gz">ensymble-0.21.tar.gz</A> (84 kB)</LI>
+<LI>Pre-squeezed version for Python v2.2:
+<A HREF="ensymble_python2.2-0.21.py">ensymble_python2.2-0.21.py</A> (81 kB)</LI>
+<LI>Pre-squeezed version for Python v2.3:
+<A HREF="ensymble_python2.3-0.21.py">ensymble_python2.3-0.21.py</A> (72 kB)</LI>
+<LI>Pre-squeezed version for Python v2.4:
+<A HREF="ensymble_python2.4-0.21.py">ensymble_python2.4-0.21.py</A> (70 kB)</LI>
+<LI>Pre-squeezed version for Python v2.5:
+<A HREF="ensymble_python2.5-0.21.py">ensymble_python2.5-0.21.py</A> (69 kB)</LI>
+<LI>Documentation:
+<A HREF="README-0.21.txt">README-0.21.txt</A> (24 kB)</LI>
+</UL>
+<P>
+Changes:
+<UL>
+<LI>Added mergesis command for combining several SIS files into one.</LI>
+</UL>
+
+v0.20 2007-01-01
+<UL>
+<LI>Source:
+<A HREF="ensymble-0.20.tar.gz">ensymble-0.20.tar.gz</A> (84 kB)</LI>
+<LI>Pre-squeezed version for Python v2.2:
+<A HREF="ensymble_python2.2-0.20.py">ensymble_python2.2-0.20.py</A> (77 kB)</LI>
+<LI>Pre-squeezed version for Python v2.3:
+<A HREF="ensymble_python2.3-0.20.py">ensymble_python2.3-0.20.py</A> (69 kB)</LI>
+<LI>Pre-squeezed version for Python v2.4:
+<A HREF="ensymble_python2.4-0.20.py">ensymble_python2.4-0.20.py</A> (67 kB)</LI>
+<LI>Pre-squeezed version for Python v2.5:
+<A HREF="ensymble_python2.5-0.20.py">ensymble_python2.5-0.20.py</A> (66 kB)</LI>
+<LI>Documentation:
+<A HREF="README-0.20.txt">README-0.20.txt</A> (24 kB)</LI>
+</UL>
+<P>
+Changes:
+<UL>
+<LI>Revamped documentation. Now every command and option is explained.</LI>
+<LI>Added signsis command for (re-)signing SIS files.</LI>
+<LI>Added altere32 command for altering pre-compiled Symbian EXEs and DLLs.</LI>
+<LI>Implemented text file option for py2sis command. This is a requirement of Symbian's
+<A HREF="https://www.symbiansigned.com/app/page/overview/freewareFaq">Freeware Route to Market</A>.</LI>
+<LI>Made py2sis language option more robust against mistyped language codes.</LI>
+<LI>Miscellaneous clean-ups</LI>
+</UL>
+
+v0.15 2006-11-18
+<UL>
+<LI>Source:
+<A HREF="ensymble-0.15.tar.gz">ensymble-0.15.tar.gz</A> (72 kB)</LI>
+<LI>Pre-squeezed version for Python v2.2:
+<A HREF="ensymble_python2.2-0.15.py">ensymble_python2.2-0.15.py</A> (66 kB)</LI>
+<LI>Pre-squeezed version for Python v2.3:
+<A HREF="ensymble_python2.3-0.15.py">ensymble_python2.3-0.15.py</A> (60 kB)</LI>
+<LI>Pre-squeezed version for Python v2.4:
+<A HREF="ensymble_python2.4-0.15.py">ensymble_python2.4-0.15.py</A> (58 kB)</LI>
+<LI>Pre-squeezed version for Python v2.5:
+<A HREF="ensymble_python2.5-0.15.py">ensymble_python2.5-0.15.py</A> (57 kB)</LI>
+<LI>Documentation (very incomplete):
+<A HREF="README-0.15.txt">README-0.15.txt</A> (9 kB)</LI>
+</UL>
+<P>
+Changes:
+<UL>
+<LI>Rewrote certificate to binary conversion. Fixes certificate problems on Windows. Some generated SIS files were not installable.</LI>
+<LI>Removed line feed after pass phrase for OpenSSL. It caused "wrong pass phrase" errors on Windows.</LI>
+</UL>
+
+v0.14 2006-11-12
+<UL>
+<LI>Source:
+<A HREF="ensymble-0.14.tar.gz">ensymble-0.14.tar.gz</A> (71 kB)</LI>
+<LI>Pre-squeezed version for Python v2.2:
+<A HREF="ensymble_python2.2-0.14.py">ensymble_python2.2-0.14.py</A> (66 kB)</LI>
+<LI>Pre-squeezed version for Python v2.3:
+<A HREF="ensymble_python2.3-0.14.py">ensymble_python2.3-0.14.py</A> (60 kB)</LI>
+<LI>Pre-squeezed version for Python v2.4:
+<A HREF="ensymble_python2.4-0.14.py">ensymble_python2.4-0.14.py</A> (58 kB)</LI>
+<LI>Pre-squeezed version for Python v2.5:
+<A HREF="ensymble_python2.5-0.14.py">ensymble_python2.5-0.14.py</A> (57 kB)</LI>
+<LI>Documentation (very incomplete):
+<A HREF="README-0.14.txt">README-0.14.txt</A> (8 kB)</LI>
+</UL>
+<P>
+Changes:
+<UL>
+<LI>Modified the generated SIS format a bit, to be compatible with Windows signsis.exe.</LI>
+<LI>Test UIDs use lower case appname now, due to Symbian OS being case insensitive. What this means is that programs "test.py" and "TeSt.pY" now get the same (automatically generated) test UID.</LI>
+<LI>Added support for signature chains. Signature chains are used by Symbian Signed (DevCerts and other certificates).</LI>
+</UL>
+
+Fourth public preview release: v0.13 2006-10-06
+<UL>
+<LI>Source:
+<A HREF="ensymble-0.13.tar.gz">ensymble-0.13.tar.gz</A> (71 kB)</LI>
+<LI>Pre-squeezed version for Python v2.2:
+<A HREF="ensymble_python2.2-0.13.py">ensymble_python2.2-0.13.py</A> (65 kB)</LI>
+<LI>Pre-squeezed version for Python v2.3:
+<A HREF="ensymble_python2.3-0.13.py">ensymble_python2.3-0.13.py</A> (59 kB)</LI>
+<LI>Pre-squeezed version for Python v2.4:
+<A HREF="ensymble_python2.4-0.13.py">ensymble_python2.4-0.13.py</A> (57 kB)</LI>
+<LI>Pre-squeezed version for Python v2.5:
+<A HREF="ensymble_python2.5-0.13.py">ensymble_python2.5-0.13.py</A> (55 kB)</LI>
+<LI>Documentation (very incomplete):
+<A HREF="README-0.13.txt">README-0.13.txt</A> (8 kB)</LI>
+</UL>
+<P>
+Changes:
+<UL>
+<LI>OpenSSL invocation uses absolute paths now. This corrects problems with Windows XP Pro.</LI>
+</UL>
+
+Third public preview release: v0.12 2006-10-05
+<UL>
+<LI>Source:
+<A HREF="ensymble-0.12.tar.gz">ensymble-0.12.tar.gz</A> (71 kB)</LI>
+<LI>Pre-squeezed version for Python v2.2:
+<A HREF="ensymble_python2.2-0.12.py">ensymble_python2.2-0.12.py</A> (66 kB)</LI>
+<LI>Pre-squeezed version for Python v2.3:
+<A HREF="ensymble_python2.3-0.12.py">ensymble_python2.3-0.12.py</A> (59 kB)</LI>
+<LI>Pre-squeezed version for Python v2.4:
+<A HREF="ensymble_python2.4-0.12.py">ensymble_python2.4-0.12.py</A> (58 kB)</LI>
+<LI>Pre-squeezed version for Python v2.5:
+<A HREF="ensymble_python2.5-0.12.py">ensymble_python2.5-0.12.py</A> (56 kB)</LI>
+<LI>Documentation (very incomplete):
+<A HREF="README-0.12.txt">README-0.12.txt</A> (8 kB)</LI>
+</UL>
+<P>
+Changes:
+<UL>
+<LI>Implemented automatic test UID generation for the py2sis command.</LI>
+<LI>Added warning message for UIDs in the protected range.</LI>
+<LI>Changed OpenSSL path detection to be carried out only on demand.</LI>
+<LI>Added debug messages for troubleshooting OpenSSL-related problems.</LI>
+<LI>Miscellaneous clean-ups</LI>
+</UL>
+
+Second public preview release: v0.11 2006-09-26
+<UL>
+<LI>Source:
+<A HREF="ensymble-0.11.tar.gz">ensymble-0.11.tar.gz</A> (71 kB)</LI>
+<LI>Pre-squeezed version for Python v2.2:
+<A HREF="ensymble_python2.2-0.11.py">ensymble_python2.2-0.11.py</A> (65 kB)</LI>
+<LI>Pre-squeezed version for Python v2.3:
+<A HREF="ensymble_python2.3-0.11.py">ensymble_python2.3-0.11.py</A> (58 kB)</LI>
+<LI>Pre-squeezed version for Python v2.4:
+<A HREF="ensymble_python2.4-0.11.py">ensymble_python2.4-0.11.py</A> (56 kB)</LI>
+<LI>Pre-squeezed version for Python v2.5:
+<A HREF="ensymble_python2.5-0.11.py">ensymble_python2.5-0.11.py</A> (55 kB)</LI>
+<LI>Documentation (very incomplete):
+<A HREF="README-0.11.txt">README-0.11.txt</A> (7 kB)</LI>
+</UL>
+<P>
+Changes:
+<UL>
+<LI>Made the default certificate a bit more anonymous.</LI>
+<LI>Added Windows (NT/2000/XP) support.</LI>
+</UL>
+
+First public preview release: v0.10 2006-09-24
+<UL>
+<LI>Source:
+<A HREF="ensymble-0.10.tar.gz">ensymble-0.10.tar.gz</A> (116 kB)</LI>
+</UL>
+
+<HR>
+<P ALIGN="right">
+Copyright &copy; 2006, 2007, 2008 Jussi Ylänen
+<BR>
+jussi &lt;dot&gt; ylanen &lt;at&gt; iki &lt;dot&gt; fi
+
+</BODY>
+</HTML>

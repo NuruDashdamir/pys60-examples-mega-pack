@@ -1,0 +1,164 @@
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><title>Python for S60 Application Packager - Help</title>
+</head><body><table bgcolor="#eeeeee" border="0" height="8" width="100%"><tbody><tr>
+	<td bgcolor="#99ccff" height="1" width="100%">
+	<strong><font face="Arial, Helvetica, sans-serif" size="5">&nbsp;<img border="0" src="python_logo.PNG" width="53" height="52">
+<a name="Top">Python for S60 Application Packager</a></font></strong></td></tr></tbody></table>
+<p class="topictitle1">Python for S60 Application Packager is used to generate signed sis files for installing Python
+scripts on S60 phones.<br> This application 
+accepts user input and invokes <i>Ensymble</i> for generating sis files. </p>
+<p class="topictitle1"><font size="5.5"><b>Packager elements</b></font></p>
+<a href="#Script_file/Directory:">Application Source</a><br>
+<a href="#Continue_with_missing_deps:">Continue with missing dependencies</a><br>
+<a href="#More:">More</a><br>
+<a href="#Less:">Less</a><br>
+<a href="#Application_title:">Application title</a><br>
+<a href="#Version:">Version</a><br>
+<a href="#UID:">UID</a><br>
+<a href="#Certificate:">Certificate</a><br>
+<a href="#Private_key:">Private key</a><br>
+<a href="#Passphrase:">Pass phrase</a><br>
+<a href="#Additional_options:">Additional options</a><br>
+<a href="#Profile:">Profile</a><br>
+<a href="#Heap_size:">Heap size</a><br>
+<a href="#Package_as:">Package As</a><br>
+<a href="#1.4.x compatibility mode:">1.4.x compatibility mode</a><br>
+<a href="#Create:">Create</a><br>
+<a href="#Reset:">Reset</a><br>
+
+<p><b><a name="Script_file/Directory:">Application Source</a></b></p>
+<blockquote>
+	<p>This is the only mandatory field. Based on the radio option selected, the browse button can be used to select either a script file or a directory. <br>
+	When a regular file name is given, it will be located under the application specific private directory, with the name <i>"default.py"</i>.<br><br>
+
+  When a directory name is given, the directory structure is preserved under an application specific private directory
+  ("<i>\private\&lt;uid&gt;\</i>") on the phone. <br>A file called "default.py" is required to exist on the root of the directory given.
+  This will be the main file that starts the application. <br>"--extrasdir" option can be used for more options for file placement. (refer <a href="#Additional_options:">Additional options</a>)
+  </p>
+</blockquote/>
+<p><b><a name="Continue_with_missing_deps:">Continue with missing dependencies</a></b></p>
+<blockquote>
+	<p>Checking this option will display the missing dependencies as warnings and continue with SIS generation.
+	   Otherwise the packaging is strict. Missing dependencies are displayed as errors and SIS generation is aborted.
+  </p>
+</blockquote/>
+<p><b><a name="More:">More</a></b></p>
+<blockquote>
+	<p>Clicking on the <i>More</i> button displays the additional fields.<br>
+	   These additional fields when entered, become the options passed on to ensymble when generating the sis file.
+	</p>
+</blockquote>
+<p><b><a name="Less:">Less</a></b></p>
+<blockquote>
+	<p>Clicking on the <i>Less</i> button hides the additional fields.<br>
+	   The values entered in the additonal fields are retained although the fields remain hidden.These values will be retained even between multiple sis creations so that the user need not have to enter these values repeatedly.
+	</p>
+</blockquote>
+<b><a name="Application_title:">Application title</a></b>
+	<blockquote>
+		Specify the name of the application.<br>If nothing is specified, the name will be derived from the input file name.
+		</blockquote>
+<b><a name="Version:">Version</a></b>
+<blockquote>
+	<p>Specify the application version in the format X.Y.Z or X,Y,Z.<br>If this field is empty, then the main Python file (refer <a href="#Script_file/Directory:">Application Source</a>) will be scanned of a special string <b>(SIS_VERSION = "1.0.0")</b>. If no version can be found, it defaults to <b>1.0.0</b>.</p>
+</blockquote>
+<p><b><a name="UID:">UID</a></b></p>
+<blockquote>
+	<p>Specify the Symbian OS UID that needs to be used for the application.<br>If this field is empty, then the main Python file (refer <a href="#Script_file/Directory:">Application Source</a>) will be scanned of a special string <b>(SYMBIAN_UID = UID)</b>. If no UID can be found a temporary UID is
+generated from the application name.</p>
+</blockquote>
+<p><b><a name="Certificate:">Certificate</a></b></p>
+<blockquote>
+	Specify the certificate that needs to be used for signing the sis file. This needs to be in <b>PEM</b> format. Click the
+	<b>Browse</b> button, next to 
+	the <b>Certificate</b> field to select the certificate.<br>If no certificate is given, then <i>Ensymble</i> uses a default self-signed certificate.
+</blockquote>
+<b><a name="Private_key:">Private key</a></b>
+<blockquote>
+	<p>Specify the private key of the selected <a href="#Certificate:">Certificate</a>. This needs to be in <b>PEM</b> format. 
+	The key is selected automatically,&nbsp; if the key is present in the same directory as the selected <a href="#Certificate:">Certificate</a> and has the same name but with <i>.key</i> extension.<br>
+	If no key is given, then <i>Ensymble</i> uses a default self-signed key.</p>
+</blockquote>
+<p><b><a name="Passphrase:">Pass phrase</a></b></p>
+<blockquote>
+	Specify the pass phrase of the selected <a href="#Private_key:">Private key</a>.<br>
+	If nothing is specified, then an empty string is used as a value for this option.
+</blockquote>
+<p><b><a name="Additional_options:">Additional options</a></b> </p>
+<blockquote>
+	<p>    This field can be used to provide additional options to <i>Ensymble</i>.
+         Press the <b>Options</b> button to view all the options supported by <i>Ensymble</i>.<br>
+
+         <br>Option for specifying the installation location of the application<br>
+          <font face="Courier New">   --drive=C<br>
+             -f C<br></font><br>
+             
+         Option for specifying the caption for the application<br>
+         <font face="Courier New">   --caption="Application Name",...<br>
+             -c "Application Name",...<br></font><br>
+         
+         <b>Note: </b>By default, the sis files are generated with the following capabilities: 
+             <b>LocalServices, NetworkServices, ReadUserData, WriteUserData, UserEnvironment</b><br>
+
+         If a different set of capabilities is needed for the application, then it can be specified using the --caps option.<br>
+         <font face="Courier New">   --caps=Cap1+Cap2+...<br>
+             -b Cap1+Cap2+...<br></font>
+   </p>
+</blockquote>
+<p><b><a name="Profile:">Profile</a></b></p>
+<blockquote>
+	<p>The selected option determines the environment in which the packaged Python script is run. The profiles are S60UI profile and Console profile. The Python core remains the same in both the profiles.</p>
+	<p><b>S60UI profile</b> provides the S60/Avkon UI environment, similar to all previous releases of PyS60.<br>
+	<b>Console profile</b> provides a non-UI, console environment based on OpenC STDIO. Applications using this option require OpenC STDIO console installed on the phone. <br>UI related modules like
+	<i>appuifw </i>and<i> graphics</i> will not work with this mode.<br></p>
+</blockquote>
+<p><b><a name="Heap_size:">Heap size</a></b></p>
+<blockquote>
+	<p>This field specifies the heap size limits (heap minimum value and heap maximum value) for the application.<br>
+	If no values are specified, then 4 kilobytes and 1 megabyte are used as minimum and maximum heap size, respectively. If 
+	any one value is given, then it is used as both minimum and maximum heap value.</span></p>
+</blockquote>
+<p><b><a name="Package_as:">Package As</a></b></p>
+<blockquote>
+	<p>The selected option determines whether the application is packaged as:
+	<p><b>Byte Code</b> (pyc/pyo), the module import is faster but the source code is not visible in tracebacks. This option is set by default.<br>
+	<b>Source Code</b> (py), the module import is slower but source code is visible in tracebacks.<br><br></p>
+</blockquote>
+<p><b><a name="1.4.x compatibility mode:">1.4.x compatibility mode</a></b></p>
+<blockquote>
+	<p>The Python core of the current release is upgraded to Python 2.5.1 and hence few Pys60 extension 
+module names clashes with those in Python core. <br>
+For example, <i>calendar</i> and <i>socket</i> modules are present in both libraries. If this option is selected 
+then, PyS60 extension modules are prioritized. If this option is not selected Python core modules are 
+prioritized over the corresponding PyS60 extension modules and these extension modules will be unavailable. However 
+the PyS60 extension modules <i>calendar</i> and <i>socket</i> can be imported using their corresponding new names
+<i>e32calendar</i> and <i>btsocket</i>.</p>
+</blockquote>
+<p><b><a name="Create:">Create</a></b></p>
+<blockquote>
+	<p>
+	Create button invokes <i>Ensymble</i> with the entries given. A window pops up displaying the result of the execution. <br>
+	This button is enabled only when the <a href="#Script_file/Directory:">Application Source</a> field is populated.
+	If the sis creation is successful, the <i>Application Source</i> field is cleared.
+	</p>
+
+</blockquote>
+<p><b><a name="Reset:">Reset</a></b></p>
+<blockquote>
+	<p>
+	Clicking on this button resets all the fields to their default state, that is, all the field entries are cleared, also, the radio and check buttons 
+	are reset to their default states.This button is enabled only if any of the fields change with respect to their default values. 
+  </p>
+</blockquote/>
+<p><b>Note: </b>Refer to <a href="README" target="_blank">Ensymble README file</a>&nbsp;for more details. </p>
+	<hr>
+	<table id="table1" bgcolor="#eeeeee" border="0" height="8" width="100%">
+		<tbody><tr>
+			<td bgcolor="#99ccff" height="1" width="100%">Copyright (c) 2008 - 2009 
+			Nokia Corporation <br>
+			<i>&nbsp;</i></td>
+		</tr>
+	</tbody></table><small style="font-size: smaller;"><br>&nbsp;</small>
+
+
+</body></html>
