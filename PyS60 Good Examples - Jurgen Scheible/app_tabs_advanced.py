@@ -29,7 +29,8 @@ entries = [(u"Signal", icon1),
 
 # create the listbox callback handler
 def handler():
-    print "done"
+    #print "done"
+    appuifw.note(unicode("done"))
     
 # create an instance of appuifw.Listbox(), include the content list "entries" and the callback function "handler"
 app1 = appuifw.Listbox(entries,handler)
@@ -43,7 +44,8 @@ L2 = [u"Stefan", u"Holger", u"Emil", u"Ludger"]
 
 # create the listbox callback handler
 def handler_L2():
-    print "ola"
+    #print "ola"
+    appuifw.note(unicode("ola"))
 
 # create the pop-up menu 
 app2 = appuifw.Listbox(L2, handler_L2) 
