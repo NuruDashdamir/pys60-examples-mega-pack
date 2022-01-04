@@ -1,7 +1,6 @@
 # Copyright (c) 2005 Jurgen Scheible
 # simple pop-up menu
 
-
 import appuifw
 
 L = [u"Python", u"Symbian", u"Mlab"]

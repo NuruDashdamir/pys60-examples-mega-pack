@@ -3,7 +3,6 @@
 
 import appuifw, e32, audio
 
-
 filename = 'e:\\boo.wav'
 
 def recording():
