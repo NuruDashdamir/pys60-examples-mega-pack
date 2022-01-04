@@ -1,5 +1,4 @@
-# This script creates a form
-
+# this script creates a form
 
 import appuifw
 import e32
