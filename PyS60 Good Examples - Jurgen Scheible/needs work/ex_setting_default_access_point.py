@@ -2,9 +2,8 @@
 # This script allows setting a default Access Point for connecting to the internet 
 # which omits the task of always manually selecting an Access Point each time when you 
 # open a Python script that connects to the internet.
-# Note: you need at least PyS60 v.1.3.17  
 
-import appuifw,socket,urllib
+import appuifw, socket, urllib, e32
 
 def unset_accesspoint():
     f = open('e:\\apid.txt','w')
