@@ -1,15 +1,15 @@
 # Copyright (c) 2006 Jurgen Scheible
-# This script allows to show a topwindów on the phone's screen
+# This script allows to show a topwindow on the phone's screen
 # in which a blue square appears and on top of it a white square smaller in size.
 # Using the application menu the topwindow can be switched on and off.
 # NOTE: PyS60 version 1.3.14 or higher is needed to run this script.
 
-import TopWindow
+import topwindow
 import graphics
 import appuifw
 import e32
 
-screen = TopWindow.TopWindow()
+screen = topwindow.TopWindow()
 img = graphics.Image.new((50,50))
 screen.add_image(img, (5,5,45,45))
 screen.size = (50, 50)
