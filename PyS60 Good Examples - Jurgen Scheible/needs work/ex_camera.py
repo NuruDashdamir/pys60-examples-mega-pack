@@ -3,12 +3,11 @@
 # use Select key to take a photo
 # press left soft key to restart the camera
 
-
-from appuifw import *
-from graphics import *
+import appuifw
 import camera
 import e32
 from key_codes import *
+from graphics import *
 
 class Keyboard(object):
     def __init__(self,onevent=lambda:None):
@@ -53,16 +52,16 @@ def handle_redraw(rect):
 canvas=appuifw.Canvas(event_callback=keyboard.handle_event, redraw_callback=handle_redraw)
 appuifw.app.body=canvas
 
-app.exit_key_handler=quit
+appuifw.app.exit_key_handler=quit
 
-screen_picture = camera.take_photo(size = (160,120))
+screen_picture = camera.take_photo()
 
 
 
 while running:
 
     if switch == 1:
-        screen_picture = camera.take_photo(size = (160,120))
+        screen_picture = camera.take_photo()
 
     img.blit(screen_picture,target=(8,10,168,130),scale=1)
 
@@ -76,17 +75,7 @@ while running:
         switch = 2
         e32.ao_yield()
         image = camera.take_photo(size = (640,480))
-        filename=u'c:\\picture.jpg'
+        filename=u'd:\\picture.jpg'
         image.save(filename)
-        screen_picture =Image.open(u'c:\\picture.jpg')
+        screen_picture =Image.open(u'd:\\picture.jpg')
         e32.ao_yield()
-
-
-
-        
-
-
- 
-
-
-
