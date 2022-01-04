@@ -10,13 +10,13 @@ from graphics import *
 # define application 1: listobx app
 
 # create your icons for the listbox content  
-icon1 = appuifw.Icon(u"z:\\system\\data\\avkon.mbm", 28, 29)
-icon2 = appuifw.Icon(u"z:\\system\\data\\avkon.mbm", 40, 41)
-icon3 = appuifw.Icon(u"z:\\system\\data\\avkon.mbm", 30, 31)
-icon4 = appuifw.Icon(u"z:\\system\\data\\avkon.mbm", 32, 33)
-icon5 = appuifw.Icon(u"z:\\system\\data\\avkon.mbm", 34, 35)
-icon6 = appuifw.Icon(u"z:\\system\\data\\avkon.mbm", 36, 37)
-icon7 = appuifw.Icon(u"z:\\system\\data\\avkon.mbm", 38, 39)
+icon1 = appuifw.Icon(u"z:\\resource\\apps\\avkon2.mbm", 28, 29)
+icon2 = appuifw.Icon(u"z:\\resource\\apps\\avkon2.mbm", 40, 41)
+icon3 = appuifw.Icon(u"z:\\resource\\apps\\avkon2.mbm", 30, 31)
+icon4 = appuifw.Icon(u"z:\\resource\\apps\\avkon2.mbm", 32, 33)
+icon5 = appuifw.Icon(u"z:\\resource\\apps\\avkon2.mbm", 34, 35)
+icon6 = appuifw.Icon(u"z:\\resource\\apps\\avkon2.mbm", 36, 37)
+icon7 = appuifw.Icon(u"z:\\resource\\apps\\avkon2.mbm", 38, 39)
 
 # create your content list of your listbox including the icons to be used for each entry
 entries = [(u"Signal", icon1),

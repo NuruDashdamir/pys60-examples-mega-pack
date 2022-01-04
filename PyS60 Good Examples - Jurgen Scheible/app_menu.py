@@ -7,11 +7,9 @@ def exit_key_handler():
 
 # create the callback functions for the application menu and its submenus
 def item1():
-    print ""
     round.set(u'item one was selected')
 
 def subitem1():
-    print ""
     round.set(u'subitem one was selected')
 
 def subitem2():
