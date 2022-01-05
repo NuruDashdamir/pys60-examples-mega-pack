@@ -1,8 +1,8 @@
-#PyCamera
-#A PyS60 application that can capture images and video
+# PyCamera
+# PyS60 application that can capture images and video
  
-#The resolutions, zoom levels and quality of content captured with this application depend on the device that is used
-#and on the way certain functions work in PyS60, so don't expect to get top-notch results, as this is only a prototype.
+# The resolutions, zoom levels and quality of content captured with this application depend on the device that is used
+# and on the way certain functions work in PyS60, so don't expect to get top-notch results, as this is only a prototype.
  
  
 import appuifw, e32, camera, os
