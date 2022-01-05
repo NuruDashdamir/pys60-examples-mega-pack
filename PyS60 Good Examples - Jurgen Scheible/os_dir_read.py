@@ -6,13 +6,13 @@ import e32
 import os
 
 # drefine the directory to read
-imagedir=u'c:\\nokia\images'
+dir_to_read = u'c:\\data'
 
 # read the directory
-files=map(unicode,os.listdir(imagedir))
+files = map(unicode, os.listdir(dir_to_read))
 
 # put the found items of the directory in to a selction list for showing them on the screen
-index=appuifw.selection_list(files)
+index = appuifw.selection_list(files)
 
 # show the slected item 
-print files[index]
+appuifw.note(files[index])
