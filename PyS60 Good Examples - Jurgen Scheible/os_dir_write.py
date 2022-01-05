@@ -1,17 +1,16 @@
 # this script lets you write a file into a directory
-
-
-
 # drefine the directory and file name to write the file into
-imagedir=u'c:\\witetest.txt'
+
+file_to_write = u'e:\\writetest.txt'
 
 # create the file
-file = open(imagedir,'w')
+file = open(file_to_write, 'w')
 
 # write some text into it
-file.write('hello, this works')
+file.write('Hello! This works!')
 
 # close the file
 file.close()
 
-print "file stored"
+# debug print
+print 'File saved!'
