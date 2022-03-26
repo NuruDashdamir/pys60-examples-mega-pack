@@ -1,18 +1,17 @@
 import e32
-from appuifw import *
-from key_codes import *
 import appuifw
-appuifw.app.screen = 'full' 
+from key_codes import *
+
 class Keyboard(object):
     def __init__(self):
         self.state = {}  # is this key pressing ?
         self.buffer= {}  # is it waiting to be processed ?
     def handle_event(self, event): # for event_callback
         code = event['scancode']
-        if event['type'] == EEventKeyDown:
+        if event['type'] == appuifw.EEventKeyDown:
             self.buffer[code]= 1   # put into queue
             self.state[code] = 1
-        elif event['type'] == EEventKeyUp:
+        elif event['type'] == appuifw.EEventKeyUp:
             self.state[code] = 0
     def pressing(self, code):      # just check
         return self.state.get(code,0)
@@ -22,14 +21,14 @@ class Keyboard(object):
             return 1
         return 0
  
-key = Keyboard()
-app.body = canvas = Canvas(event_callback=key.handle_event)
- 
 def quit():
     global running
     running = 0
- 
-app.exit_key_handler = quit
+
+key = Keyboard()
+appuifw.app.screen = 'full' 
+appuifw.app.body = canvas = appuifw.Canvas(event_callback=key.handle_event)
+appuifw.app.exit_key_handler = quit
 running = 1
  
 #
@@ -48,7 +47,7 @@ while running:
         x -= 1
     if key.pressing(EScancodeRightArrow):
         x += 1
-    if key.pressed(EScancodeSelect):
+    if key.pressing(EScancodeSelect):
         r = 1
         while key.pressing(EScancodeSelect):
             r += 1       # bigger red circle

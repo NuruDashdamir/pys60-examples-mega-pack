@@ -1,4 +1,3 @@
-SYMBIANUID=0x01E53698
 # File Browser and Editor Version 0.2
 # This software is under GPL
 # All Nokia components have Copyright (c)  by Nokia 2004

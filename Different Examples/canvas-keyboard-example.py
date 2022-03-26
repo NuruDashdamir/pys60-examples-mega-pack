@@ -1,11 +1,9 @@
 # use of keys
-# use button Arrow up,down,lefet,right, 1 and * to trigger pop-up note
+# use button arrow up, down, left, right, 1 and * to trigger pop-up note
 
 import appuifw
-from appuifw import *
 import e32
 from key_codes import *
-
 
 class Keyboard(object):
     def __init__(self,onevent=lambda:None):
@@ -31,12 +29,9 @@ class Keyboard(object):
 
 keyboard=Keyboard()
 
-
-
 def quit():
     global running
     running=0
-
 
 running=1
 
@@ -44,24 +39,17 @@ appuifw.app.screen='full'
 
 canvas=appuifw.Canvas(event_callback=keyboard.handle_event, redraw_callback=None)
 appuifw.app.body=canvas
-
-app.exit_key_handler=quit
-
-
-
+appuifw.app.exit_key_handler=quit
 
 while running:
-
     if keyboard.pressed(EScancodeLeftArrow):
         appuifw.note(u"Arrow left", "info")
 
     if keyboard.pressed(EScancodeRightArrow):
         appuifw.note(u"Arrow right", "info")
 
-
     if keyboard.pressed(EScancodeDownArrow):
         appuifw.note(u"Arrow down", "info")
-
 
     if keyboard.pressed(EScancodeUpArrow):
         appuifw.note(u"Arrow up", "info")
