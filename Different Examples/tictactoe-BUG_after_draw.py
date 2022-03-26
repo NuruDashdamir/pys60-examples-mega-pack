@@ -149,7 +149,7 @@ def play():
     if 1 <= move <= 9:
         line, column = divmod(move-1, 3)
         if grid[line][column] in player: # square already occupied?
-            appuifw.note(u"Invalid move!'", 'info')
+            appuifw.note(u"Invalid move!", 'info')
         else:
             grid[line][column] = player[0]
             player[0], player[1] = player[1], player[0] # swap players
@@ -188,7 +188,7 @@ def game():
     if winner == '*':
         appuifw.note(u"Draw!", 'info')
     else:
-        appuifw.note(u"%s wins!'" % winner, 'info')
+        appuifw.note(u"%s wins!" % winner, 'info')
 
 # main program
 setup()

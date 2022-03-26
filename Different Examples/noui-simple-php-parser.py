@@ -25,12 +25,12 @@ def parse_php(php):
   return i2
 
 if __name__=='__main__':
-  PHP="""include "php.classes/website.class.php";
+  PHP='''include "php.classes/website.class.php";
 $w=new Website();
 $w->enable("stats");
 $w->public_page();
 $w->if_admin();
-$w->display_page();"""
+$w->display_page();'''
 
   p=parse_php(PHP)
   for e in p:
