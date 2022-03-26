@@ -1,5 +1,4 @@
-
-import inbox, appuifw
+import inbox, appuifw, e32
 
 def message_received(msg_id):
         box = inbox.Inbox()
