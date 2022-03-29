@@ -1,8 +1,5 @@
 # This script creates a form
-
-
-import appuifw
-import e32
+import appuifw, e32
 
 # create an Active Object
 app_lock = e32.Ao_lock()
