@@ -1,11 +1,9 @@
-#436372
-
+import e32
+import appuifw
+import audio 
 import struct
 import math
-import e32
-import audio 
 import os
-import appuifw
 
 lock=e32.Ao_lock()
 

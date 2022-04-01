@@ -6,11 +6,7 @@ import e32
 from topwindow import TopWindow
 from graphics import Image
 
-
-
 class Pbar(object):
-
-
     def __init__(self):
         self.old_func_focus = appuifw.app.focus
         appuifw.app.focus = self.focus
