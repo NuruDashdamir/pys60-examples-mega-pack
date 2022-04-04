@@ -168,21 +168,21 @@ class Engine:
     class OptionError(Exception):
       pass
     class Option:
-      keynames={kc.EKeyLeftArrow:   'влево',
-                kc.EKeyRightArrow:  'вправо',
-                kc.EKeyUpArrow:     'вверх',
-                kc.EKeyDownArrow:   'вниз',
-                kc.EKeySelect:      'OK',
-                kc.EKeyStar:        '*',
-                kc.EKeyHash:        '#',
-                kc.EKeyYes:         'зеленая',
-                kc.EKeyNo:          'красная',
-                kc.EKeyLeftSoftkey: 'левый софт',
-                kc.EKeyRightSoftkey:'правый софт',
-                kc.EKeyMenu:        'меню',
-                kc.EKeyBackspace:   '<-',
-                kc.EKeyEdit:        'карандаш',
-                0:                  'нет клавиши'}
+      keynames={kc.EKeyLeftArrow: 'left',
+                 kc.EKeyRightArrow: 'right',
+                 kc.EKeyUpArrow: 'up',
+                 kc.EKeyDownArrow: 'down',
+                 kc.EKeySelect: 'OK',
+                 kc.EKeyStar: '*',
+                 kc.EKeyHash: '#',
+                 kc.EKeyYes: 'green',
+                 kc.EKeyNo: 'red',
+                 kc.EKeyLeftSoftkey: 'left soft',
+                 kc.EKeyRightSoftkey:'right soft',
+                 kc.EKeyMenu: 'menu',
+                 kc.EKeyBackspace: '<-',
+                 kc.EKeyEdit: 'pencil',
+                 0: 'no key'}
       def __init__(self,title,init,lst=None,func=lambda self:str(self.value)):
          self.title=title
          self.value=init
@@ -205,27 +205,27 @@ class Engine:
         if os.path.exists(self.path+'config.txt'):
           os.remove(self.path+'config.txt')
       except OSError:
-        appuifw.note(u('Не вышло'),'error')
+        appuifw.note(u('Didnt work out'),'error')
       else:
         self.needsave=0
         exit(1)
     def about():
       global version
-      globalui.global_msg_query(u('3D Тетрис\nАвтор: Elrian\nВерсия: %s\nwww.dimonvideo.ru')%str(version),u('Об игре'),0)
+      globalui.global_msg_query(u('3D Tetris\nAuthor: Elrian\nVersion: %s\nwww.dimonvideo.ru')%str(version),u('About the game'),0)
     def thanks():
       globalui.global_msg_query(u(
-'''Спасибо всем следующим людям:\n\
-Elrian - куда ж без меня:)\n\
-motix и vlad007700 - за дельные советы и замечания;\n\
-REDNBLACK.sk, werton, K.U, Abdolban, Drfss07, keytujd, maxel85, Ithan, atrant и всем остальным (чьи ники, к сожалению, не сохранились), \
-писавшим в комментариях к версиям 1.0-3.2 - за предложения и поддержку;\n\
-Всем, еще напишущим в комментарии к версиям >= 4.0 - за  помощь в улучшении программы;\n\
-Всем, качавшим файл с http://www.dimonvideo.ru/smart/uploader/4/208942/0/0 - за тестирование;\n\
-Неизвестному программисту, еще давно написавшему 3D Tetris под DOS - за идею тетриса в 3D;\n\
-DimonVideo - за замечательный сайт;\n\
-Гвидо Ван Россуму - за создание языка программирования Python \
-(который вообще-то читается как "пайтон" и не имеет никакого отношения к змеям, а только к шоу Monty Python’s Flying Circus);\n\
-Персонально ТЕБЕ - за то, что читал все эти благодарности'''),u('Благодарности'),0)
+'''Thanks to all the following people:\n\
+Elrian - where would we be without me:)\n\
+motix and vlad007700 - for good advice and comments;\n\
+REDNBLACK.sk, werton, K.U, Abdolban, Drfss07, keytujd, maxel85, Ithan, atrant and others (whose nicknames, unfortunately, have not been preserved),\
+who wrote in the comments for versions 1.0-3.2 - for suggestions and support;\n\
+To everyone else writing in the comments for versions >= 4.0 - for helping to improve the program;\n\
+Everyone who downloaded the file from http://www.dimonvideo.ru/smart/uploader/4/208942/0/0 - for testing;\n\
+To an unknown programmer who wrote 3D Tetris under DOS a long time ago - for the idea of ​​Tetris in 3D;\n\
+DimonVideo - for a great site;\n\
+Guido Van Rossum - for creating the Python programming language
+(which actually reads "python" and has nothing to do with snakes, only Monty Python's Flying Circus show);\n\
+To YOU ​​personally - for reading all these thanks'''),u('Thanks!'),0)
     def exit(type=0):
       self.exit_type=type
       wanttoplay=0
@@ -239,35 +239,35 @@ DimonVideo - за замечательный сайт;\n\
             if (0<=r<1.5):
               self.options[c].value=r
             else:
-              appuifw.note(u('Скорость должна быть в пределах:\n0<=v<1.5'),'error')
+              appuifw.note(u('Speed must be within:\n0<=v<1.5'),'error')
         elif c==1:
           r=appuifw.query(self.options[c].title,'number',self.options[c].value)
           if r!=None:
             if (4<=r<=20)and(r%2==0):
               self.options[c].value=r
             else:
-              appuifw.note(u('Ширина должна быть четной и в пределах:\n4<=x<=20'),'error')
+              appuifw.note(u('Width must be even and within:\n4<=x<=20'),'error')
         elif c==2:
           r=appuifw.query(self.options[c].title,'number',self.options[c].value)
           if r!=None:
             if (4<=r<=20)and(r%2==0):
               self.options[c].value=r
             else:
-              appuifw.note(u('Длина должна быть четной и в пределах:\n4<=y<=20'),'error')
+              appuifw.note(u('Length must be even and within:\n4<=y<=20'),'error')
         elif c==3:
           r=appuifw.query(self.options[c].title,'number',self.options[c].value)
           if r!=None:
             if (4<=r<=20):
               self.options[c].value=r
             else:
-              appuifw.note(u('Глубина должна быть в пределах:\n4<=z<=20'),'error')
+              appuifw.note(u('Depth must be within:\n4<=z<=20'),'error')
       elif self.cur_tab==1:
         appuifw.app.body=appuifw.Canvas(event_callback=catch_key)
         appuifw.app.body.clear(0)
-        appuifw.app.body.text((5,40),u('Нажми клавишу для:'),fill=0x00ff00)
+        appuifw.app.body.text((5,40),u('Press key for:'),fill=0x00ff00)
         appuifw.app.body.text((40,80),self.keyopt[c].title,fill=0xff0000)
-        appuifw.app.body.text((5,120),u('(не софткей и красную кнопку)'),fill=0x00ff00)
-        appuifw.app.body.text((5,160),u('Очистка через 3 секунды'),fill=0x00ff00)
+        appuifw.app.body.text((5,120),u('(not softkey and red button)'),fill=0x00ff00)
+        appuifw.app.body.text((5,160),u('Cleaning in 3 seconds'),fill=0x00ff00)
         appuifw.app.set_tabs([],None)
         self.options[c].value=0
         self.timer=e32.Ao_timer()
@@ -275,7 +275,7 @@ DimonVideo - за замечательный сайт;\n\
         self.lock2.wait()
         self.timer.cancel()
         appuifw.app.body=self.canvas
-        appuifw.app.set_tabs([u('Игра'),u('Управление'),u('Экран')],tab_cb)
+        appuifw.app.set_tabs([u('Game'),u('Controls'),u('Screen')],tab_cb)
         appuifw.app.activate_tab(self.cur_tab)
       elif self.cur_tab==2:
         if c==0:
@@ -286,14 +286,14 @@ DimonVideo - за замечательный сайт;\n\
               appuifw.app.orientation=orients[r]
               self.options[c].value=r
             except:
-              appuifw.note(u('Смартфон не поддерживает смену ориентации!'),'error')
+              appuifw.note(u('The smartphone does not support orientation change!'),'error')
         elif c==1:
           r=appuifw.query(self.options[c].title,'number',self.options[c].value)
           if r!=None:
             if (0<=r<=255):
               self.options[c].value=r
             else:
-              appuifw.note(u('Непрозрчачность должна быть в пределах от 0 до 255'),'error')
+              appuifw.note(u('Opacity must be between 0 and 255'),'error')
       self.needsave=1
       self.canvas.set_list([(opt.title,u(opt.f(opt))) for opt in self.options],c)
     def catch_key(event):
@@ -329,7 +329,7 @@ DimonVideo - за замечательный сайт;\n\
           for opt in self.screenopt:
             f.write('screen/'+x(opt.title)+'/'+str(opt.value)+'\n')
         except:
-          appuifw.note(u('Настройки сохранить не удалось!'),'error')
+          appuifw.note(u('Failed to save settings!'),'error')
       finally:
         try:
           f.close()
@@ -345,10 +345,10 @@ DimonVideo - за замечательный сайт;\n\
           if s[:3]=='\xef\xbb\xbf': # BOM mark
             s=s[3:]
           if s!='3D Tetris configuration\n':
-            raise OptionError('Ошибка в заголовке')
+            raise OptionError('Header error')
           s=f.readline()
           if s.split('/')[0]!='version':
-            raise OptionError('Не указана версия')
+            raise OptionError('Version not specified')
           while 1:
             s=f.readline()
             if s=='':
@@ -358,7 +358,7 @@ DimonVideo - за замечательный сайт;\n\
             s=u(s)
             p=s.split(u('/'))
             if len(p)!=3:
-              raise OptionError('Не 2 слэша в строке')
+              raise OptionError('Not 2 slashes per line')
             if p[0]==u('game'):
               self.options=self.gameopt
             elif p[0]==u('key'):
@@ -366,61 +366,60 @@ DimonVideo - за замечательный сайт;\n\
             elif p[0]==u('screen'):
               self.options=self.screenopt
             else:
-              raise OptionError('Неизвестный префикс')
+              raise OptionError('Unknown prefix')
             for opt in self.options:
               if opt.title==p[1]:
                 break
             else:
-              raise OptionError('Атрибут не найден')
+              raise OptionError('Attribute not found')
             try:
               if p[2].find('.')==-1:
                 opt.value=int(p[2])
               else:
                 opt.value=float(p[2])
             except:
-              raise OptionError('Неверное значение')
+              raise OptionError('Incorrect value')
         finally:
           f.close()
       except OptionError,e:
-        appuifw.note(u('Плохой файл настроек: %s\nИсправлено.'%e),'conf')
+        appuifw.note(u('Bad settings file: %s\nFixed.'%e),'conf')
         self.needsave=1
     
-    self.gameopt=[Option(u('Скорость'),0.5),
-                  Option(u('Ширина'),  6),
-                  Option(u('Длина'),   6),
-                  Option(u('Глубина'), 10)]
+    self.gameopt=[Option(u('Speed'),0.5),
+                   Option(u('Width'), 6),
+                   Option(u('Length'), 6),
+                   Option(u('Depth'), 10)]
     
-    self.keyopt= [Option(u('влево'),                kc.EKeyLeftArrow ,lambda:self.figure[0].move(-1,0,0),       lambda self:self.keyname()),
-                  Option(u('вправо'),               kc.EKeyRightArrow,lambda:self.figure[0].move( 1,0,0),       lambda self:self.keyname()),  
-                  Option(u('вверх'),                kc.EKeyUpArrow,   lambda:self.figure[0].move(0, 1,0),       lambda self:self.keyname()),
-                  Option(u('вниз'),                 kc.EKeyDownArrow, lambda:self.figure[0].move(0,-1,0),       lambda self:self.keyname()),
-                  Option(u('опустить'),             kc.EKeySelect,    lambda:self.figure[0].move(0,0, 1),       lambda self:self.keyname()),
-                 #Option(u('скастовать магию'),     kc.EKeyBackspace, lambda:self.figure[0].move(0,0,-1),       lambda self:self.keyname()), # cheat!
-                  Option(u('вращать пр ч. стрелки'),kc.EKey1,         lambda:self.figure[0].rotate(4,0,2),      lambda self:self.keyname()),
-                  Option(u('вращать по ч. стрелке'),kc.EKey3,         lambda:self.figure[0].rotate(1,3,2),      lambda self:self.keyname()),
-                  Option(u('вращать вперед'),       kc.EKey2,         lambda:self.figure[0].rotate(0,5,1),      lambda self:self.keyname()),
-                  Option(u('вращать назад'),        kc.EKey5,         lambda:self.figure[0].rotate(0,2,4),      lambda self:self.keyname()),
-                  Option(u('вращать налево'),       kc.EKey4,         lambda:self.figure[0].rotate(2,1,3),      lambda self:self.keyname()),
-                  Option(u('вращать направо'),      kc.EKey6,         lambda:self.figure[0].rotate(5,1,0),      lambda self:self.keyname()),
-                  #Option(u('подстройка управления'),kc.EKeyBackspace, lambda:self.resetwell(),                  lambda self:self.keyname()),
-                  Option(u('камера пр ч. стрелки'), kc.EKey7,         lambda:self.rotatecam(+10.0,0.0,0.0,+1.0),lambda self:self.keyname()),
-                  Option(u('камера по ч. стрелке'), kc.EKey9,         lambda:self.rotatecam(-10.0,0.0,0.0,+1.0),lambda self:self.keyname()),
-                  Option(u('камера вперед'),        kc.EKey8,         lambda:self.rotatecam(+10.0,+1.0,0.0,0.0),lambda self:self.keyname()),
-                  Option(u('камера назад'),         kc.EKey0,         lambda:self.rotatecam(-10.0,+1.0,0.0,0.0),lambda self:self.keyname()),
-                  Option(u('камера налево'),        kc.EKeyStar,      lambda:self.rotatecam(+10.0,0.0,+1.0,0.0),lambda self:self.keyname()),
-                  Option(u('камера направо'),       kc.EKeyHash,      lambda:self.rotatecam(-10.0,0.0,+1.0,0.0),lambda self:self.keyname()),
-                  Option(u('камера сброс'),         kc.EKeyYes,       lambda:self.resetcam(),                   lambda self:self.keyname()),
-                  Option(u('скриншот'),             kc.EKeyEdit,
+    self.keyopt= [Option(u('left'), kc.EKeyLeftArrow, lambda:self.figure[0].move(-1,0,0), lambda self:self.keyname()),
+                  Option(u('right'), kc.EKeyRightArrow, lambda:self.figure[0].move( 1,0,0), lambda self:self.keyname()),
+                  Option(u('up'), kc.EKeyUpArrow, lambda:self.figure[0].move(0, 1,0), lambda self:self.keyname()),
+                  Option(u('down'), kc.EKeyDownArrow, lambda:self.figure[0].move(0,-1,0), lambda self:self.keyname()),
+                  Option(u('lower'), kc.EKeySelect, lambda:self.figure[0].move(0,0, 1), lambda self:self.keyname()),
+                 #Option(u('cast magic'), kc.EKeyBackspace, lambda:self.figure[0].move(0,0,-1), lambda self:self.keyname()), # cheat!
+                  Option(u('rotate other h. arrows'),kc.EKey1, lambda:self.figure[0].rotate(4,0,2), lambda self:self.keyname()),
+                  Option(u('rotate clockwise'),kc.EKey3, lambda:self.figure[0].rotate(1,3,2), lambda self:self.keyname()),
+                  Option(u('rotate forward'), kc.EKey2, lambda:self.figure[0].rotate(0,5,1), lambda self:self.keyname()),
+                  Option(u('rotate backward'), kc.EKey5, lambda:self.figure[0].rotate(0,2,4), lambda self:self.keyname()),
+                  Option(u('rotate left'), kc.EKey4, lambda:self.figure[0].rotate(2,1,3), lambda self:self.keyname()),
+                  Option(u('rotate right'), kc.EKey6, lambda:self.figure[0].rotate(5,1,0), lambda self:self.keyname()),
+                  #Option(u('control adjustment'),kc.EKeyBackspace, lambda:self.resetwell(), lambda self:self.keyname()),
+                  Option(u('rotate camera'), kc.EKey7, lambda:self.rotatecam(+10.0,0.0,0.0,+1.0),lambda self:self.keyname()),
+                  Option(u('camera clockwise'), kc.EKey9, lambda:self.rotatecam(-10.0,0.0,0.0,+1.0),lambda self:self.keyname()),
+                  Option(u('camera forward'), kc.EKey8, lambda:self.rotatecam(+10.0,+1.0,0.0,0.0),lambda self:self.keyname()),
+                  Option(u('camera back'), kc.EKey0, lambda:self.rotatecam(-10.0,+1.0,0.0,0.0),lambda self:self.keyname()),
+                  Option(u('camera left'), kc.EKeyStar, lambda:self.rotatecam(+10.0,0.0,+1.0,0.0),lambda self:self.keyname()),
+                  Option(u('camera right'), kc.EKeyHash, lambda:self.rotatecam(-10.0,0.0,+1.0,0.0),lambda self:self.keyname()),
+                  Option(u('camera reset'), kc.EKeyYes, lambda:self.resetcam(), lambda self:self.keyname()),
+                  Option(u('screenshot'), kc.EKeyEdit,
                      lambda:graphics.screenshot().save('c:\\data\\Images\\3Dtetris'+str(random.randrange(10000))+'.jpg'),lambda self:self.keyname())]
     
-    self.screenopt=[Option(u('Ориентация экрана'),0,  ['автоматически','портрет','ландшафт'], lambda self:self.lst[self.value]),
-                    Option(u('Непрозрачн следующей'),127)]
+    self.screenopt=[Option(u('Screen orientation'),0, ['auto','portrait','landscape'], lambda self:self.lst[self.value]), Option(u('Next Opaque'), 127)]
     appuifw.app.screen='normal'
     lock=e32.Ao_lock()
     self.lock2=e32.Ao_lock()
-    appuifw.app.title=u('3D Тетрис. Настройки.')
-    appuifw.app.set_tabs([u('Игра'),u('Управление'),u('Экран')],tab_cb)
-    appuifw.app.menu=[ (u('Играть'),play),(u('Стандартные настройки'),default),(u('Об игре'),about),(u('Благодарности'),thanks),(u('Выход'),exit)]
+    appuifw.app.title=u('3D Tetris. Settings.')
+    appuifw.app.set_tabs([u('Game'),u('Controls'),u('Screen')],tab_cb)
+    appuifw.app.menu=[ (u('Play'),play),(u('Default Settings'),default),(u('About'),about),(u('Thanks'), thanks),(u('Exit'),exit)]
     appuifw.app.exit_key_handler=exit
     try:
       if not os.path.exists(self.path):
@@ -429,11 +428,11 @@ DimonVideo - за замечательный сайт;\n\
         try:
           loadoptions()
         except e:
-          appuifw.note(u('Настройки загрузить не удалось!'),'error')
+          appuifw.note(u('Settings could not be loaded!'),'error')
       else:
         needsave=1
     except:
-      appuifw.note(u('Ошибка при создании каталога '+self.path+'. Не будет загрузки/сохранения настроек!'),'error')
+      appuifw.note(u('Error creating directory '+self.path+'. Will not load/save settings!'),'error')
     self.options=self.gameopt
     appuifw.app.body=self.canvas=appuifw.Listbox([(opt.title,u(opt.f(opt))) for opt in self.options], change)
     self.cur_tab=0
@@ -679,7 +678,7 @@ while 1:
     if app.exit_type==0:
       break
     elif app.exit_type==2:
-      if not appuifw.query(u('Ты набрал очков: %i\nХочешь еще одну попытку?')%app.score,'query'):
+      if not appuifw.query(u('You scored: %i\nDo you want another try?')%app.score,'query'):
         break
 app=None
 appuifw.app.set_exit()
