@@ -3,13 +3,9 @@ import appuifw
 import e32
 import socket
 
-def ru(x):
-    return x.decode('utf-8')
-
-
 appuifw.app.body = text = appuifw.Text()
 appuifw.app.body.color = 255
-appuifw.app.title = ru('\xd0\x92\xd0\xb2\xd0\xb5\xd0\xb4\xd0\xb8\xd1\x82\xd0\xb5 URL')
+appuifw.app.title = u'Enter URL'
 
 def ok():
     try:
@@ -25,10 +21,8 @@ def ok():
     text.set(ru(ur))
 
 
-
 def clear():
     text.set('')
-
 
 
 def access():
@@ -38,12 +32,11 @@ def access():
     set.close()
 
 
-appuifw.app.menu = [(u'Ok',
-  ok),
- (ru('\xd0\x9e\xd1\x87\xd0\xb8\xd1\x81\xd1\x82\xd0\xb8\xd1\x82\xd1\x8c'),
-  clear),
- (ru('\xd0\xa2\xd0\xbe\xd1\x87\xd0\xba\xd0\xb0 \xd0\xb4\xd0\xbe\xd1\x81\xd1\x82\xd1\x83\xd0\xbf\xd0\xb0'),
-  access)]
+appuifw.app.menu = [
+ (u'Ok', ok),
+ (u'Clear', clear),
+ (u'Access Point', access)
+ ]
 
 def exit():
     appuifw.app.set_exit()
