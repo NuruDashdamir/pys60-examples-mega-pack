@@ -1,21 +1,21 @@
 
-import btsocket, appuifw
+import socket, appuifw
 
 def chat_server():
-    server = btsocket.socket(btsocket.AF_BT, btsocket.SOCK_STREAM)
-    channel = btsocket.bt_rfcomm_get_available_server_channel(server)
+    server = socket.socket(socket.AF_BT, socket.SOCK_STREAM)
+    channel = socket.bt_rfcomm_get_available_server_channel(server)
     server.bind(("", channel))
     server.listen(1)
-    btsocket.bt_advertise_service(u"btchat", server, True, btsocket.RFCOMM)
-    btsocket.set_security(server, btsocket.AUTH | btsocket.AUTHOR)
+    socket.bt_advertise_service(u"btchat", server, True, socket.RFCOMM)
+    socket.set_security(server, socket.AUTH | socket.AUTHOR)
     print "Waiting for clients..."
     conn, client_addr = server.accept()
     print "Client connected!"
     talk(conn, None)
 
 def chat_client():
-    conn = btsocket.socket(btsocket.AF_BT, btsocket.SOCK_STREAM)
-    address, services = btsocket.bt_discover()
+    conn = socket.socket(socket.AF_BT, socket.SOCK_STREAM)
+    address, services = socket.bt_discover()
     if 'btchat' in services:
         channel = services[u'btchat']
         conn.connect((address, channel))

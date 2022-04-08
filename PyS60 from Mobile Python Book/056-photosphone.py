@@ -1,18 +1,18 @@
 
-import camera, e32, btsocket, appuifw
+import camera, e32, socket, appuifw
 
 PHOTO = u"e:\\Images\\bt_photo_send.jpg"
 
 def send_photo():
     try:
-            address, services = btsocket.bt_obex_discover()
+            address, services = socket.bt_obex_discover()
     except:
             appuifw.note(u"OBEX Push not available", "error")
             return
         
     if u'OBEX Object Push' in services:
             channel = services[u'OBEX Object Push']
-            btsocket.bt_obex_send_file(address, channel, PHOTO)
+            socket.bt_obex_send_file(address, channel, PHOTO)
             appuifw.note(u"photo sent", "info")
     else:
             appuifw.note(u"OBEX Push not available", "error")
