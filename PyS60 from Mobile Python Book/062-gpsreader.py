@@ -1,11 +1,11 @@
 
-import btsocket
+import socket
 
-address, services = btsocket.bt_discover()
+address, services = socket.bt_discover()
 print "Discovered: %s, %s" % (address, services)
 target = (address, services.values()[0])
 
-conn = btsocket.socket(btsocket.AF_BT, btsocket.SOCK_STREAM)
+conn = socket.socket(socket.AF_BT, socket.SOCK_STREAM)
 conn.connect(target)
 to_gps = conn.makefile("r", 0)
 
