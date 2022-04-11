@@ -1,4 +1,4 @@
-import appuifw,os,e32,string
+import appuifw,os,e32
 def ru(x):
  return x.decode("utf-8")
 def ur(x):
@@ -25,7 +25,7 @@ def info():
 def back(path):
   if len(path)==3:return ''
   path=path.split('\\')[:-2]
-  path= string.join(path,'\\')
+  path= '\\'.join(path)
   return path+'\\'
 def exit():
  global run
