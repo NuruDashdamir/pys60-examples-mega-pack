@@ -1,12 +1,5 @@
-#
 # test_contacts.py
-#
-# Copyright (c) 2005 Nokia. All rights reserved.
-#
-
-#
 # PLEASE TRY THIS WITH A MOBILE DEDICATED TO TESTING PURPOSES ONLY.
-#
 
 import contacts
 import time
