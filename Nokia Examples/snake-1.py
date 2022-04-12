@@ -17,7 +17,7 @@ class SnakeGame:
         self.wormlocs=[]
         self.wormlength=10
         self.foodloc=None
-        self.fieldcolor=(192,192,128)        
+        self.fieldcolor=(192,192,128)
         self.state='init'        
         self.old_body=appuifw.app.body
         self.canvas=appuifw.Canvas(redraw_callback=self.redraw)
