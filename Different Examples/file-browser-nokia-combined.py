@@ -84,7 +84,7 @@ class Filebrowser:
     def __init__(self):
         self.script_lock = e32.Ao_lock()
         self.dir_stack = []
-        self.current_dir = dir_iter.Directory_iter(e32.drive_list())
+        self.current_dir = Directory_iter(e32.drive_list())
 
     def run(self):
         from key_codes import EKeyLeftArrow
