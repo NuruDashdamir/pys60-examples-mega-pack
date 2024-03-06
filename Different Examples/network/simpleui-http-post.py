@@ -1,7 +1,4 @@
 # this script lets you upload an XML file to a server.
-
-
-# use both the httplib, urllib libraries
 import httplib, urllib
 import appuifw
 

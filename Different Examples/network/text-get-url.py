@@ -1,46 +1,28 @@
 import urllib
 import appuifw
 import e32
-import socket
 
-appuifw.app.body = text = appuifw.Text()
+text = appuifw.Text()
+text.set(u'http://httpforever.com')
+appuifw.app.body = text
 appuifw.app.body.color = 255
 appuifw.app.title = u'Enter URL'
 
 def ok():
-    try:
-        file = open('e:\\system\\apps\\geturl\\set.ini', 'r')
-        poin = file.read()
-        file.close()
-        socket.set_default_access_point(socket.access_point(int(poin)))
-    except:
-        pass
-    url = text.get()
-    urln = urllib.urlopen(url)
-    ur = urln.geturl()
-    text.set(ru(ur))
-
+    url_address = text.get()
+    html_content = urllib.urlopen(url_address).read()
+    text.set(unicode(html_content))
 
 def clear():
-    text.set('')
-
-
-def access():
-    point = socket.select_access_point()
-    set = open('e:\\system\\apps\\geturl\\set.ini', 'w')
-    set.write(str(point))
-    set.close()
-
+    text.set(u'')
 
 appuifw.app.menu = [
  (u'Ok', ok),
  (u'Clear', clear),
- (u'Access Point', access)
- ]
+]
 
 def exit():
     appuifw.app.set_exit()
-
 
 lock = e32.Ao_lock()
 appuifw.app.exit_key_handler = exit

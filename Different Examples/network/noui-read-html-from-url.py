@@ -1,12 +1,10 @@
 import urllib
 
-def get_data_from_url(address):
+def get_text_from_url(address):
     return urllib.urlopen(address).read()
 
-print("Downloading")
 url_address = "http://google.com"
-data_from_url = get_data_from_url(url_address)
-print("Downloaded!")
+data_from_url = get_text_from_url(url_address)
+
+# don't print whole string, it causes bugs, print is only for debugging 
 print(data_from_url[:128])
-# DO NOT PRINT WHOLE STRING, IT CAUSES BUGS
-# PRINT IS ONLY FOR DEBUGGING
