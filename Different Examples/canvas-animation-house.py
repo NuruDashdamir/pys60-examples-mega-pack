@@ -1,9 +1,7 @@
 #script by Albert927
-
 import appuifw
-from appuifw import *
 import e32
-from graphics import *
+import graphics
 
 line_position_x=[]
 line_position_y=[]
@@ -119,7 +117,7 @@ def handle_redraw(rect):
     if img:
         canvas.blit(img)
 appuifw.app.body=canvas=appuifw.Canvas(event_callback=None,redraw_callback=handle_redraw)
-img=Image.new(canvas.size) 
+img=graphics.Image.new(canvas.size) 
 
 running=1
 def quit():

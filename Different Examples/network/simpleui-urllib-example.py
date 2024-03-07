@@ -12,7 +12,7 @@ def fetchfile():
         urllib.urlretrieve(url, tempfile)
         appuifw.note(u"Image received", "info")
     except:
-        print "Could not fetch file."
+        appuifw.note(u"Could not fetch file", "info")
 
 if appuifw.query(u"fetch image?","query"):
     fetchfile()
