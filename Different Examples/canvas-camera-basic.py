@@ -9,7 +9,7 @@ def shoot():
     photo = camera.take_photo(size = (640, 480))
     w, h = canvas.size
     canvas.blit(photo, target = (0, 0, w, 0.75 * w), scale = 1)
-    image.save('e:\\Images\\photo.jpg')
+    photo.save('D:\\photo.jpg')
 
 def quit():
     camera.stop_finder()

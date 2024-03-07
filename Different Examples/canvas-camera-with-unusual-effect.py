@@ -1,29 +1,22 @@
-DEBUG = True
-VERSION = u'1.10'
 import e32
 import sysinfo
 import appuifw
 import graphics
+import camera
+import _camera
+
+VERSION = u'1.10'
 canvas = None
 img = ima = mask = None
 img0 = ima0 = None
 img1 = ima1 = None
 xx = yy = cx = cy = vx = vy = dx = 0
-RGB_BLACK = (0,
- 0,
- 0)
-RGB_WHITE = (255,
- 255,
- 255)
+RGB_BLACK = (0, 0, 0)
+RGB_WHITE = (255, 255, 255)
 
-def cb_redraw(dummy = (0,
- 0,
- 0,
- 0)):
+def cb_redraw(dummy = (0, 0, 0, 0)):
     if img:
         canvas.blit(img)
-
-
 
 def cb_view(im):
     global cy
@@ -51,8 +44,6 @@ def cb_view(im):
     img.blit(im, target=(cx,
      cy), mask=mask)
     canvas.blit(img)
-
-
 
 def set_camera(id):
     global vx
@@ -89,8 +80,6 @@ def set_camera(id):
     else:
         appuifw.note(u'Cannot find other camera!', 'error')
 
-
-
 def wait_note(s1, s2):
     fnt = 'title'
     ((x1, y1, x2, y2,), dummy, dummy,) = canvas.measure_text(s1, font=fnt)
@@ -101,12 +90,8 @@ def wait_note(s1, s2):
      (((vy / 2) - (y1 / 2)) + 20)), s2, RGB_WHITE, fnt)
     canvas.blit(img)
 
-
-
 def menu_about():
     appuifw.note((((u'Kameramation v' + VERSION) + u'\n') + u'jouni.miettunen.googlepages.com\n\xa92009 Jouni Miettunen'))
-
-
 
 def cb_quit():
     camera.stop_finder()
@@ -114,8 +99,7 @@ def cb_quit():
     app_lock.signal()
 
 
-if (e32.pys60_version_info > (1,
- 9)):
+if (e32.pys60_version_info > (1, 9)):
     screen = 'full'
 else:
     screen = 'large'
@@ -164,8 +148,7 @@ if (xx > 320):
     dx = 20
 else:
     dx = 10
-import camera
-import _camera
+
 camera.start_finder(cb_view, size=(((3 * vx) / 4),
  ((3 * vy) / 4)))
 app_lock = e32.Ao_lock()

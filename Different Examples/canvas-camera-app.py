@@ -12,39 +12,33 @@ scapsz = None
 sviewsz = None
 
 def __exit__( ):
-  global end
-  global stopp
-  global stopr
-  stopp = True
-  stopr = True
-  end = True
-  stop( )
-  SCRIPT_LOCK.signal( )
+    global end
+    global stopp
+    global stopr
+    stopp = True
+    stopr = True
+    end = True
+    stop()
+    SCRIPT_LOCK.signal( )
   
 def selviewsz():
-   iitems = [(176,144),(320,240),(640,480)]
-   uitems = [u'176x144',u'320x240',u'640x480']
-   index = appuifw.selection_list(uitems)
-    
-   if index == None:
-	index = 2
-
-   return iitems[index]
+    iitems = [(176,144),(320,240),(640,480)]
+    uitems = [u'176x144',u'320x240',u'640x480']
+    index = appuifw.selection_list(uitems)
+    if index == None: index = 2 
+    return iitems[index]
   
 def changeviewsz():
-   global sviewsz
-   stop()
-   sviewsz = None
-   start()	
- 
+    global sviewsz
+    stop()
+    sviewsz = None
+    start()
+
 def start( ):
     global sviewsz
-    
     if sviewsz==None:
-    	sviewsz = selviewsz()
-	
+        sviewsz = selviewsz()
     camera.start_finder( vfCallback, size=sviewsz)
-	    
     appuifw.app.menu = mainmenu_live
  
 def stop( ):
@@ -56,7 +50,7 @@ def stop( ):
     cnvCallback( )
     appuifw.app.menu = mainmenu_stopped
 
-def vfCallback( aIm ):
+def vfCallback(aIm):
     global stack
     global fps
     global tm2
@@ -69,41 +63,33 @@ def vfCallback( aIm ):
     global textrect
     fpc=fpc+1
     tm2=t.time()
-    if(tm2-tm>=1):
-	fps=fpc
-	fpc=0
-	tm = tm2
-    if(len(stack)<60):
-    	img.blit(aIm,scale=1)
-	appuifw.app.body.blit(img)
-	IMG = aIm
-	text_img.clear(0)
-	text_img.text(((-textrect[0],-textrect[1])),
-		unicode(str(fps)),fill=0xff0000,font='normal')
-	appuifw.app.body.blit(text_img)
-	stack.append(IMG)
+    if tm2-tm>=1:
+        fps=fpc
+        fpc=0
+        tm = tm2
+    if len(stack)<60:
+        img.blit(aIm, scale=1)
+        appuifw.app.body.blit(img)
+        IMG = aIm
+        text_img.clear(0)
+        text_img.text(((-textrect[0],-textrect[1])), unicode(str(fps)), fill=0xff0000, font='normal')
+        appuifw.app.body.blit(text_img)
+        stack.append(IMG)
 
 
 def displaytxt(txt, timg, trect):
-	timg.text(((-trect[0],-trect[1])),
-		unicode(txt),fill=0xff0000,font='normal')
+    timg.text(((-trect[0],-trect[1])), unicode(txt), fill=0xff0000, font='normal')
 
 def cnvCallback( aRect=None ):
-   appuifw.app.body.clear( )
-   #if IMG!=None:     
-	#img.blit(IMG,scale=1)
-        #appuifw.app.body.blit(img)
+    appuifw.app.body.clear()
 
 def selcapsz():
-   iitems = camera.image_sizes()
-   uitems = []
-   for i in iitems:
-	uitems.append(unicode(i))    
-   index = appuifw.selection_list(uitems)
-    
-   if index == None:
-	index = 0
-   return iitems[index]	
+    iitems = camera.image_sizes()
+    uitems = []
+    for i in iitems: uitems.append(unicode(i))
+    index = appuifw.selection_list(uitems)   
+    if index == None: index = 0
+    return iitems[index]	
 
 def capture( ):
     global img2
@@ -116,9 +102,8 @@ def capture( ):
     
     appuifw.app.menu = [(u'Exit', __exit__)]
      
-    if scapsz==None:
-       	scapsz=selcapsz()
-    		
+    if scapsz==None: scapsz=selcapsz()
+	
     img2.clear()
     displaytxt("capturing ...",img2, textrect2)
     appuifw.app.body.blit(img2)
@@ -151,17 +136,17 @@ def save():
    tot = len(stack)
    f.write(str(len(stack))+"\n")
    while (len(stack)>0) and not stopr:
-		aImg = stack.pop()
-		aImg.save(u'd:\\t.jpg')
-		f2=open(u'd:\\t.jpg',mode='r')
-		bz = f2.read()
-		f.write(str(len(bz))+"\n")
-		f.write(bz)
-		f2.close()
-		img2.blit(aImg,scale=1)
-		displaytxt("saving "+str(i)+"/"+str(tot),img2, textrect2)
-		appuifw.app.body.blit(img2)
-		i=i+1
+        aImg = stack.pop()
+        aImg.save(u'd:\\t.jpg')
+        f2=open(u'd:\\t.jpg',mode='r')
+        bz = f2.read()
+        f.write(str(len(bz))+"\n")
+        f.write(bz)
+        f2.close()
+        img2.blit(aImg,scale=1)
+        displaytxt("saving "+str(i)+"/"+str(tot),img2, textrect2)
+        appuifw.app.body.blit(img2)
+        i=i+1
    f.close()
    img2.blit(aImg,scale=1)
    displaytxt("saved video!",img2, textrect2)
@@ -170,50 +155,49 @@ def save():
    start()
  
 def play():
-   global img2
-   global textrect2
-   global stack
-   global stopp
-   
-   f = None
-   
-   try:
-   	f = open(u'd:\\out.mjpeg',mode='r')
-   except:
-	appuifw.note(u'Save video first!', 'info')
-	return
-   
-   stop()
-   stopp = False
-   appuifw.app.menu = [(u'Stop', stop)]
+    global img2
+    global textrect2
+    global stack
+    global stopp
 
-   images = int(f.readline())
-   tot = images
-   i=0
-   timage=None
-   try:	
-	while (images>0) and not stopp:
-	   imagel = int(f.readline())
-	   bz = f.read(imagel)
-	   f2=open(u'd:\\t.jpg',mode='w')
-	   f2.write(bz)
-	   f2.close()
-	   timage=Image.open(u'd:\\t.jpg')
-	   img2.blit(timage,scale=1)
-	   displaytxt("playing "+str(i)+"/"+str(tot),img2, textrect2)
-	   appuifw.app.body.blit(img2)
-	   #e32.ao_sleep(0.005)
-	   images=images-1
-	   i=i+1
-   except:
-	appuifw.note(u'Corrupt vbuffer', 'info')
+    f = None
+
+    try:
+        f = open(u'd:\\out.mjpeg',mode='r')
+    except:
+        appuifw.note(u'Save video first!', 'info')
+        return
+   
+    stop()
+    stopp = False
+    appuifw.app.menu = [(u'Stop', stop)]
+
+    images = int(f.readline())
+    tot = images
+    i=0
+    timage=None
+    try:	
+        while (images>0) and not stopp:
+            imagel = int(f.readline())
+            bz = f.read(imagel)
+            f2=open(u'd:\\t.jpg',mode='w')
+            f2.write(bz)
+            f2.close()
+            timage=Image.open(u'd:\\t.jpg')
+            img2.blit(timage,scale=1)
+            displaytxt("playing "+str(i)+"/"+str(tot),img2, textrect2)
+            appuifw.app.body.blit(img2)
+            #e32.ao_sleep(0.005)
+            images=images-1
+            i=i+1
+    except:
+        appuifw.note(u'Corrupt vbuffer', 'info')
 	
-   if(timage!=None):
-   	img2.blit(timage,scale=1)
-   displaytxt("playing fin!",img2, textrect2)
-   f.close()
-   stack=[]
-   appuifw.app.menu = mainmenu_play
+    if(timage!=None): img2.blit(timage,scale=1)
+    displaytxt("playing fin!",img2, textrect2)
+    f.close()
+    stack=[]
+    appuifw.app.menu = mainmenu_play
 		
 		
 mainmenu_live = [(u'Play Video', play),(u'Save Video', save), (u'Capture HQ Image', capture), (u'Change View Size', changeviewsz)]
